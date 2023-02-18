@@ -10,7 +10,7 @@ dimensions = (28, 28)
 
 def load(path = "../data/"):
     t0 = time.time()
-    print("\tLoading fashionmnist")
+    print("Loading fashionmnist")
 
     with gzip.open(path + "fashionmnist/train-labels.gz", "rb") as lbpath:
         train_labels = np.frombuffer(lbpath.read(), dtype=np.uint8, offset=8)
