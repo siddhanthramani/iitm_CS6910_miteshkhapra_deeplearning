@@ -25,11 +25,11 @@ def load(path = "../data/"):
     with gzip.open(path + "fashionmnist/test-images.gz", "rb") as lbpath:
         test_images = np.frombuffer(lbpath.read(), dtype=np.uint8, offset=16)
     test_images = test_images.reshape((-1, 1, 28, 28)).astype("float32")
-
+    
     data = {
-        "train_X": train_images,
+        "train_X": train_images.reshape(-1, 28*28, 1),
         "train_y": train_labels,
-        "test_X": test_images,
+        "test_X": test_images.reshape(-1, 28*28, 1),
         "test_y": test_labels,
     }
 
