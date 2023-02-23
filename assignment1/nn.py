@@ -1,8 +1,8 @@
 import numpy as np
 
 class neural_network():
-    
-    def __init__(self, num_neurons_dict, activation_dict, activation_type="constant", loss_function = "cross_entropy", nn_init = np.random.rand, nn_init_random_max=1):
+    epsilon = 0.0001
+    def __init__(self, num_neurons_dict, activation_dict, activation_type="constant", loss_function = "cross_entropy", nn_init = np.random.rand, nn_init_random_max=0.01):
         self.num_neurons_dict = num_neurons_dict
         self.activation_dict = activation_dict
         self.activation_type = activation_type
@@ -25,8 +25,7 @@ class neural_network():
             self.W[layer] = nn_init(num_neurons_dict[layer-1], num_neurons) * nn_init_random_max
             self.b[layer] = nn_init(num_neurons, 1) * nn_init_random_max
 
-        print("hi")
-            
+
     def __get_activation_function(self, layer):
         if self.activation_type == "constant":
             if layer == max(self.layers):
@@ -46,7 +45,7 @@ class neural_network():
         elif activation == "tanh":
             return np.tanh(input)
         elif activation == "softmax":
-            return (np.exp(-input)/ np.exp(-input).sum())
+            return (np.exp(input)/ np.exp(input).sum())
 
 
     def __forward_pass(self, x_i):
@@ -64,22 +63,22 @@ class neural_network():
     def __grad_activation(self, ak, activation):
         if activation == "logistic":
             inter = self.__activation_function(ak, activation)
-            return (inter/(1-inter))
+            return (inter/(1-inter+self.epsilon))
         elif activation == "tanh":
             inter = self.__activation_function(ak, activation)
             return (1 - np.square(inter))
             
     def __get_loss(self, a_i, h_i, y):
         if self.loss_function == "cross_entropy":
-            if not self.activation_dict[self.max_layer] == "softmax":
+            if not self.__get_activation_function(self.max_layer) == "softmax":
                 raise Exception("Cross entropy can be used only if the final activation function is softmax")
 
-            loss = -np.sum(np.multiply(y, np.log(h_i[self.max_layer])))
+            loss = -np.sum(np.multiply(y, np.log(h_i[self.max_layer] + self.epsilon)))
         return loss
     
     def __common_backward_pass(self, a_i, h_i, y):
         if self.loss_function == "cross_entropy":
-            if not self.activation_dict[self.max_layer] == "softmax":
+            if not self.__get_activation_function(self.max_layer) == "softmax":
                 raise Exception("Cross entropy can be used only if the final activation function is softmax")
 
             grad_loss_h = dict()
@@ -92,13 +91,16 @@ class neural_network():
             for layer in self.layers:
                 grad_layer = self.max_layer - layer + 1
                 grad_loss_W[grad_layer] = np.dot(h_i[grad_layer-1], np.transpose(grad_loss_a[grad_layer]))
+
                 grad_loss_b[grad_layer] = grad_loss_a[grad_layer]
                 if grad_layer == 1:
                     break
                 grad_loss_h[grad_layer-1] = np.dot(self.W[grad_layer], grad_loss_a[grad_layer])
                 grad_loss_a[grad_layer-1] = np.multiply(grad_loss_h[grad_layer-1], 
                                                 self.__grad_activation(a_i[grad_layer-1], 
-                                                                        self.__get_activation_function(grad_layer)))
+                                                                        self.__get_activation_function(grad_layer-1)))
+
+                
 
         elif self.loss_function == "squared_error":
             loss = np.sum(np.square(h_i[max(self.layers)] - y))
@@ -129,7 +131,6 @@ class neural_network():
             b_eta_shape = self.b[layer].shape
             self.W[layer] -= np.multiply(np.full(W_eta_shape, self.param_dict["eta"]), global_grad_loss_W[layer])
             self.b[layer] -= np.multiply(np.full(b_eta_shape, self.param_dict["eta"]), global_grad_loss_b[layer])
-
         
     def fit(self, all_x, all_y, minibatch_size=0, epochs=1, gradient_descent_type="sgd", **kwargs):
         self.grad_loss_update_first_time = 0
