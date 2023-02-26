@@ -14,23 +14,21 @@ nn1 = neural_network(num_neurons_dict, activation_dict, nn_init_random_max=0.01)
 # output = nn1.predict(data["train_X"][0])
 # print(output)
 
-nn1.fit(data["train_X"]/255, data["train_y"], eta=0.00001, epochs=1, minibatch_size = 64)
-output = nn1.predict(data["train_X"][0])
-print(data["train_y"][0])
-print(output)
+nn1.fit(data["train_X"]/255, data["train_y"], eta=0.00001, epochs=10, minibatch_size = 64)
+# output = nn1.predict(data["train_X"][0])
+# print(data["train_y"][0])
+# print(output)
 
-output = nn1.predict(data["train_X"][1])
-print(data["train_y"][1])
-print(output)
+# output = nn1.predict(data["train_X"][1])
+# print(data["train_y"][1])
+# print(output)
 
 accuracy = 0
 total = 0
-for index, x in enumerate(data["test_X"][0:20]):
+for index, x in enumerate(data["test_X"]):
     output = nn1.predict(x, 0)
-    print(output)
     prediction = np.argmax(output) + 1
     y_hat = data["test_y"][index]
-    print(prediction, y_hat)
     if prediction == y_hat:
         accuracy += 1
     total+=1
