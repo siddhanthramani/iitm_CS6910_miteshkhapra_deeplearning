@@ -70,4 +70,3 @@ if __name__ == "__main__":
     data = load()
     plt = plot_random_image_per_class(data)
     plt.savefig("../sample3.jpg")
-    print("hello")
