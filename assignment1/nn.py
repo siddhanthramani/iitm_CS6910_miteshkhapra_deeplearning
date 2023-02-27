@@ -40,8 +40,27 @@ class neural_network():
                 continue
             self.W[layer] = nn_init(num_neurons, num_neurons_dict[layer-1], **nn_init_params) * nn_init_random_max
             self.b[layer] = nn_init(num_neurons, 1, **nn_init_params) * nn_init_random_max
+        
+        # self.W[1] = np.array([np.array([0.22491641, 0.02180481])
+        #             , np.array([0.26076326, 0.12215034])
+        #             , np.array([0.25546389, 0.21189626])
+        #             , np.array([0.10628627, 0.01291387])])
+        # # 2x4
+        # self.W[2] = np.array([np.array([0.00461026, 0.33884685, 0.25269835, 0.10613222])
+        #                     , np.array([0.21316539, 0.01781372, 0.03532867, 0.25390077])])
 
+        # # 4x1
+        # self.b[1] = np.array([np.array([0.05422128])
+        #                     , np.array([0.37212847])
+        #                     , np.array([0.16308096])
+        #                     , np.array([0.01445151])])
 
+        # # 2x1
+        # self.b[2] = np.array([np.array([0.54795226])
+        #                     , np.array([0.50381235])])
+
+        # print(self.W)
+        # print(self.b)
     # A helper function used to get the activation function of a particular layer
     def __get_activation_function(self, layer):
         # checks that layer value is correct
@@ -129,7 +148,8 @@ class neural_network():
         elif activation == "tanh":
             activated_val = self.__forward_activation(ak, activation)
             return (1 - np.square(activated_val))
-    
+        elif activation == "linear":
+            return 1
 
     # Calculated the gradient of pre-activation max_layer wrt output
     def __grad_wrt_output(self, y_pred, y, activation):
@@ -242,10 +262,12 @@ class neural_network():
         global_grad_loss_b = dict()
         
         num_points_seen = 0
+        number_of_classes = self.num_neurons_dict[self.max_layer] 
 
         for epoch in range(epochs):            
             for x_i, y in zip(all_x, all_y):
-                y = np.array([1 if i==(y-1) else 0 for i in range(10)]).reshape(10, 1)
+                
+                y = np.array([1 if i==(y-1) else 0 for i in range(number_of_classes)]).reshape(number_of_classes, 1)
                 a_i, h_i = self.__forward_prop(x_i)
     
                 grad_loss_W, grad_loss_b = self.__back_prop(a_i, h_i, y)
@@ -256,10 +278,11 @@ class neural_network():
                 if num_points_seen % minibatch_size == 0:         
                     self.__gradient_descent_type_dict[gradient_descent_type](global_grad_loss_W, global_grad_loss_b)
                     num_points_seen, global_grad_loss_W, global_grad_loss_b = self.__step_reset()
-            
+                
             epoch_loss = list()
-            for x_i, y in zip(all_x, all_y):
-                epoch_loss.append(self.__get_loss(self.predict(x_i), y))
+            for x_i, y in zip(all_x, all_y): 
+               y = np.array([1 if i==(y-1) else 0 for i in range(number_of_classes)]).reshape(number_of_classes, 1)
+               epoch_loss.append(self.__get_loss(self.predict(x_i), y))
             print("Epoch Loss - {} is : {}".format(epoch+1, np.average(np.array(epoch_loss))))
         print("Model fitting is over.")
 
