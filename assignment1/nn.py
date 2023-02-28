@@ -308,6 +308,8 @@ class neural_network():
         return x_i
 
 
+
+
     def save_model(self, file_location):
         model_json = {
             "num_neurons_dict" : self.num_neurons_dict,

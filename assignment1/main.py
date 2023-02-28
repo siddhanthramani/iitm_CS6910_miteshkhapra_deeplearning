@@ -24,7 +24,7 @@ activation_dict = {0 : "logistic", 1 : "softmax"}
 nn1 = neural_network(num_neurons_dict, activation_dict, nn_init=xavier_init, weight_type="w")
 # nn1 = neural_network(num_neurons_dict, activation_dict, nn_init=np.random.rand) #, weight_type="w"
 
-nn1.fit(data["train_X"]/255, data["train_y"], eta=0.00001, epochs=100, minibatch_size = 0)
+nn1.fit(data["train_X"]/255, data["train_y"], eta=0.00003, epochs=100, minibatch_size = 0)
 # nn1.fit(data["train_X"]/255, data["train_y"], gradient_descent_type = "momentum", eta=0.0001, beta = 0.09, epochs=20, minibatch_size = 128)
 
 print(nn1.W)
@@ -49,5 +49,3 @@ for index, x in enumerate(data["train_X"]):
         accuracy += 1
     total+=1
 print(accuracy*100/total)
-
-
