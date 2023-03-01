@@ -125,3 +125,25 @@ output = nn1.predict(np.array([-1, 1]).reshape(2, 1), 0)
 print(np.argmax(output) + 1)
 output = nn1.predict(np.array([1, 1]).reshape(2, 1), 0)
 print(np.argmax(output) + 1)
+
+
+        # self.W[1] = np.array([np.array([0.22491641, 0.02180481])
+        #             , np.array([0.26076326, 0.12215034])
+        #             , np.array([0.25546389, 0.21189626])
+        #             , np.array([0.10628627, 0.01291387])])
+        # # 2x4
+        # self.W[2] = np.array([np.array([0.00461026, 0.33884685, 0.25269835, 0.10613222])
+        #                     , np.array([0.21316539, 0.01781372, 0.03532867, 0.25390077])])
+
+        # # 4x1
+        # self.b[1] = np.array([np.array([0.05422128])
+        #                     , np.array([0.37212847])
+        #                     , np.array([0.16308096])
+        #                     , np.array([0.01445151])])
+
+        # # 2x1
+        # self.b[2] = np.array([np.array([0.54795226])
+        #                     , np.array([0.50381235])])
+
+        # print(self.W)
+        # print(self.b)
