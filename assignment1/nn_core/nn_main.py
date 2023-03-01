@@ -1,8 +1,10 @@
 import numpy as np
 import json 
 from sklearn.metrics import confusion_matrix
-from sklearn.metrics import classification_report
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
+from nn_core.nn_activations import *
+from nn_core.nn_loss import *
+from nn_core.nn_optimizer import *
 
 class neural_network():
     # Epsilon is a small value which is added when we do not want a value to go to zero
@@ -63,53 +65,6 @@ class neural_network():
         else:
             activation = self.activation_dict[layer]
         return activation
-    
-
-    # This gets the loss between y_pred and y(y_actual)
-    def __get_loss(self, y_pred, y):
-        if self.loss_function == "cross_entropy":
-            if not self.__get_activation_function(self.max_layer) == "softmax":
-                raise Exception("Cross entropy can be used only if the final activation function is softmax")
-
-            loss = -np.sum(np.multiply(y, np.log(y_pred + self.epsilon)))
-    
-        elif self.loss_function == "squared_error":
-            loss = np.sum(np.square(y_pred - y))
-        
-        return loss
-
-
-    # A set of two logistic functions to ensure stable outputs 
-    # for positive and negative inputs respectively 
-    def __positive_logistic(self, input):
-        return 1 / (1 + np.exp(-input))
-    def __negative_logistic(self, input):
-        exp_inp = np.exp(input)
-        return exp_inp / (1 + exp_inp)
-
-
-    # Returns an activated input as per activation value 
-    def __forward_activation(self, input, activation):
-        if activation == "linear":
-            return input
-        
-        # Numerically stable logistic - https://stackoverflow.com/questions/51976461/optimal-way-of-defining-a-numerically-stable-sigmoid-function-for-a-list-in-pyth
-        elif activation == "logistic":
-            pos_inputs = input >=0
-            neg_inputs = ~pos_inputs
-
-            result = np.empty_like(input, dtype=np.float)
-            result[pos_inputs] = self.__positive_logistic(input[pos_inputs])
-            result[neg_inputs] = self.__negative_logistic(input[neg_inputs])
-            return result
-        
-        elif activation == "tanh":
-            return np.tanh(input)
-        
-        # Numerically stable softmax - https://cs231n.github.io/linear-classify/#softmax
-        elif activation == "softmax":
-            softmax_num = np.exp(input - np.max(input))
-            return (softmax_num/ np.sum(softmax_num))
 
 
     # Forward propogation - computes each pre-activation and activation till predicted output
@@ -121,29 +76,11 @@ class neural_network():
         for layer in self.layers:
             a_i[layer] = np.add(np.dot(self.W[layer], h_i[layer-1]), self.b[layer])
             activation = self.__get_activation_function(layer)
-            h_i[layer] = self.__forward_activation(a_i[layer], activation)
+            h_i[layer] = forward_activation(a_i[layer], activation)
 
         return a_i, h_i
     
-
-    # Calculated gradients of activated values
-    def __grad_activation(self, ak, activation):
-        if activation == "logistic":
-            activated_val = self.__forward_activation(ak, activation)
-            return (activated_val * (1 - activated_val))
-        elif activation == "tanh":
-            activated_val = self.__forward_activation(ak, activation)
-            return (1 - np.square(activated_val))
-        elif activation == "linear":
-            return 1
-
-
-    # Calculated the gradient of pre-activation max_layer wrt output
-    def __grad_wrt_output(self, y_pred, y, activation):
-        if activation == "softmax":
-            return - (y - y_pred)
-    
-
+    # Backward propogation
     def __back_prop(self, a_i, h_i, y):
         if self.loss_function == "cross_entropy":
             # Check - our cross_entropy algo is optimized for softmax
@@ -158,7 +95,7 @@ class neural_network():
             grad_loss_h = dict()
 
             # Inits the pre_activation grad wrt output for max layer (final layer)
-            grad_loss_a[self.max_layer] = self.__grad_wrt_output(h_i[self.max_layer], y
+            grad_loss_a[self.max_layer] = grad_wrt_output(y, h_i[self.max_layer]
                                                 , self.__get_activation_function(self.max_layer))            
             # Loops through each layer in reverse
             for grad_layer in self.layers[::-1]:
@@ -171,7 +108,7 @@ class neural_network():
                 
                 grad_loss_h[grad_layer-1] = np.dot(np.transpose(self.W[grad_layer]), grad_loss_a[grad_layer])
                 grad_loss_a[grad_layer-1] = np.multiply(grad_loss_h[grad_layer-1], 
-                                                self.__grad_activation(a_i[grad_layer-1], 
+                                                        grad_activation(a_i[grad_layer-1], 
                                                                         self.__get_activation_function(grad_layer-1)))
 
         elif self.loss_function == "squared_error":
@@ -278,7 +215,7 @@ class neural_network():
             # Print validation loss
             for x_i, y in zip(epoch_x, epoch_y): 
                y = np.array([1 if i==(y-1) else 0 for i in range(number_of_classes)]).reshape(number_of_classes, 1)
-               epoch_loss.append(self.__get_loss(self.__predict_single_input(x_i), y))
+               epoch_loss.append(get_loss(y, self.__predict_single_input(x_i), self.loss_function, self.epsilon))
             print("Epoch Loss - {} is : {}".format(epoch+1, np.average(np.array(epoch_loss))))
         print("Model fitting is over.")
 
@@ -296,7 +233,7 @@ class neural_network():
         for layer in self.layers:
             x_i = np.add(np.dot(self.W[layer], x_i), self.b[layer])
             activation = self.__get_activation_function(layer)
-            x_i = self.__forward_activation(x_i, activation)
+            x_i = forward_activation(x_i, activation)
         return x_i
         
 
@@ -306,13 +243,13 @@ class neural_network():
             for layer in self.layers:
                 x_i = np.add(np.dot(self.W[layer], x_i), self.b[layer])
                 activation = self.__get_activation_function(layer)
-                x_i = self.__forward_activation(x_i, activation)
+                x_i = forward_activation(x_i, activation)
             y_pred.append(np.argmax(x_i) + 1)
         return np.array(y_pred)
 
 
     def get_accuracy_metrics(self, y_true, y_pred, micron_on=0, 
-                             macro_on=0, weighted_on=0, report_on=0):
+                             macro_on=0, weighted_on=0, confusion_on=0):
         return_values = []
         accuracy = accuracy_score(y_true, y_pred)
         return_values.append(accuracy)
@@ -341,11 +278,9 @@ class neural_network():
             return_values.append(recall_weighted)
             return_values.append(f1_weighted)
 
-        if report_on:
+        if confusion_on:
             confusion = confusion_matrix(y_true, y_pred)
-            classification_report = classification_report(y_true, y_pred, 
-                                    target_names=["Class_{}".format(i) for i in self.layers])
-            return_values.append(confusion, classification_report)
+            return_values.append(confusion)
         
         return return_values
 

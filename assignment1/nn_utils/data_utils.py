@@ -1,4 +1,3 @@
-
 import gzip
 import numpy as np
 import time
@@ -37,8 +36,10 @@ def load(path = "../data/"):
 
     return data
 
+
 def plot_image(image):
     plt.show(image)
+
 
 def get_random_class_indices(label_data):
     random_sample_indices = []
@@ -46,6 +47,7 @@ def get_random_class_indices(label_data):
         random_sample = random.choice(np.argwhere(label_data==unique_class))
         random_sample_indices.append(random_sample)
     return random_sample_indices
+
 
 def plot_random_image_per_class(data, from_dataset="train"):
     label_data = data["{}_y".format(from_dataset)]
@@ -65,6 +67,7 @@ def plot_random_image_per_class(data, from_dataset="train"):
         
             
     return plt
+
 
 def do_checks(X_check, y_check):
     for x, y in zip(X_check, y_check):

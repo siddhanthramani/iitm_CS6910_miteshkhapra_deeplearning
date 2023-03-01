@@ -1,7 +1,7 @@
 # Imports required modules
-from utils import load, get_random_class_indices, do_checks
-from nn import neural_network
-from helper import xavier_init
+from nn_utils.data_utils import load, get_random_class_indices, do_checks
+from nn_core.nn_main import neural_network
+from nn_user.weight_init import xavier_init
 import numpy as np
 from sklearn.model_selection import train_test_split
 
@@ -33,4 +33,4 @@ nn1.fit(X_train, y_train, X_val, y_val, eta=0.00001, epochs=50, minibatch_size =
 output = nn1.predict(X_test)
 accuracy_metrics = nn1.get_accuracy_metrics(y_test, output)
 for val in accuracy_metrics:
-    print(val)
+    print(val*100)
