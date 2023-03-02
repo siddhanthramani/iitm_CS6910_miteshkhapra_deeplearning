@@ -1,5 +1,6 @@
 import numpy as np
 from copy import deepcopy
+from nn_utils import constants
 import math
 
 class regular_gradient_descent:
@@ -128,6 +129,8 @@ class nestrov_accelerated_gradient_descent:
 
     def step_update(self):
         if self.step_update_first_time:
+            self.actual_W = dict()
+            self.actual_b = dict()
             self.step_update_first_time = 0
         else:
             self.nn_instance.W = deepcopy(self.actual_W)
@@ -145,12 +148,8 @@ class nestrov_accelerated_gradient_descent:
             self.nn_instance.W[layer] -= self.prev_total_grad_loss_W[layer]
             self.nn_instance.b[layer] -= self.prev_total_grad_loss_b[layer]
             
-        self.actual_W = deepcopy(self.nn_instance.W)
-        self.actual_b = deepcopy(self.nn_instance.b)
-
-        for layer in self.nn_instance.layers:
-            W_shape = self.nn_instance.W[layer].shape
-            b_shape = self.nn_instance.b[layer].shape
+            self.actual_W[layer] = deepcopy(self.nn_instance.W[layer])
+            self.actual_b[layer] = deepcopy(self.nn_instance.b[layer])
             self.nn_instance.W[layer] -= np.multiply(np.full(W_shape, self.beta), self.prev_total_grad_loss_W[layer])
             self.nn_instance.b[layer] -= np.multiply(np.full(b_shape, self.beta), self.prev_total_grad_loss_b[layer])
 
@@ -166,8 +165,6 @@ class nestrov_accelerated_gradient_descent:
         for layer in self.nn_instance.layers:
                 self.prev_total_grad_loss_W[layer] = np.zeros(self.nn_instance.W[layer].shape)
                 self.prev_total_grad_loss_b[layer] = np.zeros(self.nn_instance.b[layer].shape)
-        self.local_W = dict()
-        self.local_b = dict()
         self.grad_update_first_time = 1
 
 
@@ -208,8 +205,8 @@ class RMSProp:
             self.prev_total_grad_loss_b[layer] = np.add(np.multiply(np.full(b_shape, self.beta), self.prev_total_grad_loss_b[layer])
                                                         , np.multiply(np.full(b_shape, (1-self.beta)), np.square(self.total_grad_loss_b[layer])))
             
-            self.nn_instance.W[layer] -= np.sqrt(self.prev_total_grad_loss_W[layer]) + 
-            self.nn_instance.b[layer] -= np.sqrt(self.prev_total_grad_loss_b[layer]) + 
+            self.nn_instance.W[layer] -= np.multiply(self.eta, self.total_grad_loss_W[layer]) / (np.sqrt(self.prev_total_grad_loss_W[layer]) + constants.epsilon)
+            self.nn_instance.b[layer] -= np.multiply(self.eta, self.total_grad_loss_b[layer]) / (np.sqrt(self.prev_total_grad_loss_b[layer]) + constants.epsilon)
         
         self.step_reset()
 

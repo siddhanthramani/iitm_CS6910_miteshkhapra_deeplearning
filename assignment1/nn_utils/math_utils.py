@@ -1,5 +1,4 @@
 import numpy as np
-
 # A set of two logistic functions to ensure stable outputs 
 # for positive and negative inputs respectively 
 def positive_logistic(input):

@@ -1,7 +1,7 @@
 import numpy as np
-
+from nn_utils import constants
 # This gets the loss between y_pred and y(y_actual)
-def get_loss(y, y_pred, loss_function, epsilon = 1e-8):
+def get_loss(y, y_pred, loss_function, epsilon = constants.epsilon):
     if loss_function == "cross_entropy":
         loss = -np.sum(np.multiply(y, np.log(y_pred + epsilon)))
 
