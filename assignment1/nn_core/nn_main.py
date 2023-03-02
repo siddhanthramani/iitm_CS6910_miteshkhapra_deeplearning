@@ -1,10 +1,9 @@
 import numpy as np
-import json 
-from sklearn.metrics import confusion_matrix
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
+import json
 from nn_core.nn_activations import *
 from nn_core.nn_loss import *
 from nn_core.nn_optimizer import *
+from nn_utils.output_utils import get_accuracy_metrics
 
 class neural_network():
     # Epsilon is a small value which is added when we do not want a value to go to zero
@@ -14,32 +13,21 @@ class neural_network():
     def __init__(self, num_neurons_dict, activation_dict, activation_type="constant"
                  , loss_function="cross_entropy" , nn_init=np.random.rand, nn_init_random_max=1
                  , **nn_init_params):
-        # contains the neural architecture
+        
+        # setting up the neural architecture
         self.num_neurons_dict = num_neurons_dict
-        # contains the activation function of each layer
         self.activation_dict = activation_dict
-        # contains the metadata of activation_dict
         self.activation_type = activation_type
-        # contains the loss function to be used
         self.loss_function = loss_function
 
         # setting up frequently required instance variables
         self.layers = list(range(1, len(num_neurons_dict.keys())))
         self.max_layer = max(self.layers)
-        # contains the weights of the model
-        self.W = dict()
-        # contains the biases of the model
-        self.b = dict()
-
-        # a dict which maps gradient algo name to respective algo function
-        self.__gradient_descent_type_dict = {
-            "sgd" : self.__sgd_step_update,
-            "momentum" : self.__momentum_step_update
-        }
-        # a dict which contains parameters which can be passed for fitting model
-        self.param_dict = dict()
-
+        self.number_of_classes = self.num_neurons_dict[self.max_layer] 
+                
         # sets up the initial weights of the neural network as per user input
+        self.W = dict()
+        self.b = dict()
         for layer, num_neurons in sorted(num_neurons_dict.items()):
             if layer == 0:
                 continue
@@ -48,7 +36,7 @@ class neural_network():
         
 
     # A helper function used to get the activation function of a particular layer
-    def __get_activation_function(self, layer):
+    def __helper_get_activation_function(self, layer):
         # checks that layer value is correct
         if layer < 1 or layer > self.max_layer:
             raise Exception("Activation function exists only for layers between 1 and max layer")
@@ -67,6 +55,10 @@ class neural_network():
         return activation
 
 
+    def __helper_get_one_hot_encoded_y(self, y):
+        return np.array([1 if i==(y-1) else 0 for i in range(self.number_of_classes)]).reshape(self.number_of_classes, 1)
+
+
     # Forward propogation - computes each pre-activation and activation till predicted output
     def __forward_prop(self, x_i):
         a_i = dict()
@@ -75,16 +67,17 @@ class neural_network():
         h_i[0] = x_i
         for layer in self.layers:
             a_i[layer] = np.add(np.dot(self.W[layer], h_i[layer-1]), self.b[layer])
-            activation = self.__get_activation_function(layer)
+            activation = self.__helper_get_activation_function(layer)
             h_i[layer] = forward_activation(a_i[layer], activation)
 
         return a_i, h_i
-    
+
+
     # Backward propogation
     def __back_prop(self, a_i, h_i, y):
         if self.loss_function == "cross_entropy":
             # Check - our cross_entropy algo is optimized for softmax
-            if not self.__get_activation_function(self.max_layer) == "softmax":
+            if not self.__helper_get_activation_function(self.max_layer) == "softmax":
                 raise Exception("Cross entropy can be used only if the final activation function is softmax")
 
             # Inits values
@@ -96,7 +89,7 @@ class neural_network():
 
             # Inits the pre_activation grad wrt output for max layer (final layer)
             grad_loss_a[self.max_layer] = grad_wrt_output(y, h_i[self.max_layer]
-                                                , self.__get_activation_function(self.max_layer))            
+                                                , self.__helper_get_activation_function(self.max_layer))            
             # Loops through each layer in reverse
             for grad_layer in self.layers[::-1]:
                 grad_loss_W[grad_layer] = np.dot(grad_loss_a[grad_layer], np.transpose(h_i[grad_layer-1]))
@@ -109,7 +102,7 @@ class neural_network():
                 grad_loss_h[grad_layer-1] = np.dot(np.transpose(self.W[grad_layer]), grad_loss_a[grad_layer])
                 grad_loss_a[grad_layer-1] = np.multiply(grad_loss_h[grad_layer-1], 
                                                         grad_activation(a_i[grad_layer-1], 
-                                                                        self.__get_activation_function(grad_layer-1)))
+                                                                        self.__helper_get_activation_function(grad_layer-1)))
 
         elif self.loss_function == "squared_error":
             loss = np.sum(np.square(h_i[max(self.layers)] - y))
@@ -120,30 +113,6 @@ class neural_network():
 
         return grad_loss_W, grad_loss_b 
 
-
-    def __grad_update(self, accumulated_grad_loss_W, accumulated_grad_loss_b, grad_loss_W, grad_loss_b):
-        for layer in self.layers:
-            # For first time update, we init accumalated value
-            if self.grad_update_first_time:
-                accumulated_grad_loss_W[layer] = grad_loss_W[layer]
-                accumulated_grad_loss_b[layer] = grad_loss_b[layer]
-            # For all other times, we accumulate the gradient
-            else:
-                accumulated_grad_loss_W[layer] += grad_loss_W[layer]
-                accumulated_grad_loss_b[layer] += grad_loss_b[layer]
-        self.grad_update_first_time = 0
-
-        return accumulated_grad_loss_W, accumulated_grad_loss_b
-        
-
-    def __sgd_step_update(self, global_grad_loss_W, global_grad_loss_b):
-        for layer in self.layers:
-            W_eta_shape = self.W[layer].shape
-            b_eta_shape = self.b[layer].shape
-            
-            self.W[layer] -= np.multiply(np.full(W_eta_shape, self.param_dict["eta"]), global_grad_loss_W[layer])
-            self.b[layer] -= np.multiply(np.full(b_eta_shape, self.param_dict["eta"]), global_grad_loss_b[layer])
-    
 
     def __momentum_step_update(self, global_grad_loss_W, global_grad_loss_b):
         if self.step_update_first_time == 1:
@@ -170,9 +139,25 @@ class neural_network():
             
         self.prev_global_grad_loss_W = u_W.copy()
         self.prev_global_grad_loss_b = u_b.copy()
-        
 
-    def fit(self, train_x, train_y, val_x = None, val_y = None, minibatch_size=0, epochs=1, gradient_descent_type="sgd", **kwargs):
+
+    def __train(self, train_x, train_y, optimizer, minibatch_size):
+        if not minibatch_size:
+            minibatch_size = len(train_y)
+
+        for x_i, y in zip(train_x, train_y):
+            y = self.__helper_get_one_hot_encoded_y(y)
+            
+            a_i, h_i = self.__forward_prop(x_i)
+            grad_loss_W, grad_loss_b = self.__back_prop(a_i, h_i, y)
+
+            optimizer.grad_update(grad_loss_W, grad_loss_b)
+    
+            if optimizer.num_points_seen % minibatch_size == 0:   
+                optimizer.step_update()
+
+
+    def __validate(self, train_x, train_y, val_x=None, val_y=None):
         # Epoch init
         epoch_loss = list()
         if val_x is not None and val_y is not None:
@@ -182,57 +167,41 @@ class neural_network():
             epoch_x = train_x
             epoch_y = train_y
         
-        self.grad_update_first_time = 1
-        self.step_update_first_time = 1
+        for x_i, y in zip(epoch_x, epoch_y): 
+            y = self.__helper_get_one_hot_encoded_y(y)
+            epoch_loss.append(get_loss(y, self.__predict_single_input(x_i), self.loss_function, self.epsilon))
         
-        for param, param_val in kwargs.items():
-            self.param_dict[param] = param_val
-        
-        if not minibatch_size:
-            minibatch_size = len(train_y)
+        y_pred = self.predict(epoch_x)
+        accuracy_metrics = get_accuracy_metrics(epoch_y, y_pred)
 
-        global_grad_loss_W = dict()
-        global_grad_loss_b = dict()
-        
-        num_points_seen = 0
-        number_of_classes = self.num_neurons_dict[self.max_layer] 
+        return (round(np.average(np.array(epoch_loss)), 4)
+                , round(accuracy_metrics[0], 4))
 
-        for epoch in range(epochs):            
-            for x_i, y in zip(train_x, train_y):
-                
-                y = np.array([1 if i==(y-1) else 0 for i in range(number_of_classes)]).reshape(number_of_classes, 1)
-                a_i, h_i = self.__forward_prop(x_i)
-    
-                grad_loss_W, grad_loss_b = self.__back_prop(a_i, h_i, y)
-                global_grad_loss_W, global_grad_loss_b =  self.__grad_update(global_grad_loss_W, global_grad_loss_b, 
-                                                                            grad_loss_W, grad_loss_b)
-                num_points_seen += 1
 
-                if num_points_seen % minibatch_size == 0:         
-                    self.__gradient_descent_type_dict[gradient_descent_type](global_grad_loss_W, global_grad_loss_b)
-                    num_points_seen, global_grad_loss_W, global_grad_loss_b = self.__step_reset()
-                
-            # Print validation loss
-            for x_i, y in zip(epoch_x, epoch_y): 
-               y = np.array([1 if i==(y-1) else 0 for i in range(number_of_classes)]).reshape(number_of_classes, 1)
-               epoch_loss.append(get_loss(y, self.__predict_single_input(x_i), self.loss_function, self.epsilon))
-            print("Epoch Loss - {} is : {}".format(epoch+1, np.average(np.array(epoch_loss))))
+    def fit(self, optimizer, train_x, train_y, val_x=None, val_y=None
+            , minibatch_size=0, epochs=1):
+        list_validation_loss = []
+        list_validation_accuracy = []
+        for epoch in range(epochs):   
+            # Train
+            self.__train(train_x, train_y, optimizer, minibatch_size)
+            
+            # Validate
+            validation_loss, validation_accuracy = self.__validate(train_x, train_y, val_x, val_y)
+            print("Epoch - {}\tValidation Loss - {}\tValidation Accuracy - {}"
+                  .format(epoch+1, validation_loss, validation_accuracy))
+            list_validation_loss.append(validation_loss)
+            list_validation_accuracy.append(validation_accuracy)
+
         print("Model fitting is over.")
-
-
-    def __step_reset(self):
-        num_points_seen = 0
-        global_grad_loss_b = dict()
-        global_grad_loss_W = dict()
-        self.grad_update_first_time = 1
-        return num_points_seen, global_grad_loss_W, global_grad_loss_b
+        return list_validation_loss, list_validation_accuracy
 
 
     def __predict_single_input(self, single_input_x):
         x_i = single_input_x.copy()
         for layer in self.layers:
             x_i = np.add(np.dot(self.W[layer], x_i), self.b[layer])
-            activation = self.__get_activation_function(layer)
+            activation = self.__helper_get_activation_function(layer)
             x_i = forward_activation(x_i, activation)
         return x_i
         
@@ -242,47 +211,10 @@ class neural_network():
         for x_i in vec_x:
             for layer in self.layers:
                 x_i = np.add(np.dot(self.W[layer], x_i), self.b[layer])
-                activation = self.__get_activation_function(layer)
+                activation = self.__helper_get_activation_function(layer)
                 x_i = forward_activation(x_i, activation)
             y_pred.append(np.argmax(x_i) + 1)
         return np.array(y_pred)
-
-
-    def get_accuracy_metrics(self, y_true, y_pred, micron_on=0, 
-                             macro_on=0, weighted_on=0, confusion_on=0):
-        return_values = []
-        accuracy = accuracy_score(y_true, y_pred)
-        return_values.append(accuracy)
-
-        if micron_on:
-            precision_micro = precision_score(y_true, y_pred, average='micro')
-            recall_micro = recall_score(y_true, y_pred, average='micro')
-            f1_micro = f1_score(y_true, y_pred, average='micro')
-            return_values.append(precision_micro)
-            return_values.append(recall_micro)
-            return_values.append(f1_micro)
-
-        if macro_on:
-            precision_macro = precision_score(y_true, y_pred, average='macro')
-            recall_macro = recall_score(y_true, y_pred, average='macro')
-            f1_macro = f1_score(y_true, y_pred, average='macro')
-            return_values.append(precision_macro)
-            return_values.append(recall_macro)
-            return_values.append(f1_macro)
-
-        if weighted_on:
-            precision_weighted = precision_score(y_true, y_pred, average='weighted')
-            recall_weighted = recall_score(y_true, y_pred, average='weighted')
-            f1_weighted = f1_score(y_true, y_pred, average='weighted')
-            return_values.append(precision_weighted)
-            return_values.append(recall_weighted)
-            return_values.append(f1_weighted)
-
-        if confusion_on:
-            confusion = confusion_matrix(y_true, y_pred)
-            return_values.append(confusion)
-        
-        return return_values
 
 
     def save_model(self, file_location):
