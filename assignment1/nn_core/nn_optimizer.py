@@ -128,7 +128,7 @@ class nestrov_accelerated_gradient_descent:
         for layer in self.nn_instance.layers:
             self.total_grad_loss_W[layer] += grad_loss_W[layer]
             self.total_grad_loss_b[layer] += grad_loss_b[layer]
-        self.num_points_seen += 1        
+        self.num_points_seen += 1   
 
 
     def step_update(self):

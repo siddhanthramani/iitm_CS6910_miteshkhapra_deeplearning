@@ -40,7 +40,7 @@ nn1 = neural_network(num_neurons_dict, activation_dict, nn_init=xavier_init, wei
 
 # Fitting the data to the model
 # optimizer = regular_gradient_descent(nn1, eta=0.00001)
-optimizer = momentum_gradient_descent(nn1, eta=0.00001, beta=0.9)
+optimizer = nestrov_accelerated_gradient_descent(nn1, eta=0.00001, beta=0.9)
 # optimizer = RMSProp(nn1, eta=0.001, beta=0.9)
 # optimizer = NAdam(nn1, eta=0.001, beta1=0.9, beta2=0.99)
 list_validation_loss, list_validation_accuracy = nn1.fit(optimizer, X_train, y_train, X_val
