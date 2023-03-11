@@ -4,6 +4,7 @@ from nn_utils.output_utils import get_accuracy_metrics
 from nn_core.nn_main import neural_network
 from nn_core.nn_optimizer import *
 from nn_user.weight_init import xavier_init
+from nn_user.augment_data import rotate_img
 import numpy as np
 from sklearn.model_selection import train_test_split
 import json
@@ -41,8 +42,11 @@ nn1 = neural_network(num_neurons_dict, activation_dict, nn_init=xavier_init, wei
 # Fitting the data to the model
 # optimizer = regular_gradient_descent(nn1, eta=0.00001)
 # optimizer = nestrov_accelerated_gradient_descent(nn1, eta=0.00001, beta=0.9)
-optimizer = Adadelta(nn1, eta=0.001, beta=0.9)
-# optimizer = NAdam(nn1, eta=0.001, beta1=0.9, beta2=0.99)
+# optimizer = Adadelta(nn1, eta=0.001, beta=0.9)
+optimizer = NAdam(nn1, eta=0.001, beta1=0.9, beta2=0.99)
+print(len(X_train), len(y_train))
+X_train, y_train = rotate_img(X_train, y_train)
+print(len(X_train), len(y_train))
 list_validation_loss, list_validation_accuracy = nn1.fit(optimizer, X_train, y_train, X_val
                                                          , y_val, epochs=50, minibatch_size = 0)
 # nn1.fit(data["train_X"]/255, data["train_y"], gradient_descent_type = "momentum", eta=0.0001, beta = 0.09, epochs=20, minibatch_size = 128)
