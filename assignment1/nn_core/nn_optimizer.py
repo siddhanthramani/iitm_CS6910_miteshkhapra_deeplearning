@@ -53,7 +53,19 @@ class momentum_gradient_descent:
         self.beta = beta
         self.eta = eta
         self.nn_instance = neural_network_instance
-        self.step_reset()
+        self.setup()
+
+
+    def setup(self):
+        self.num_points_seen = 0
+        self.total_grad_loss_W = dict()
+        self.total_grad_loss_b = dict()
+        self.prev_total_grad_loss_W = dict()
+        self.prev_total_grad_loss_b = dict()
+        for layer in self.nn_instance.layers:
+                self.prev_total_grad_loss_W[layer] = np.zeros(self.nn_instance.W[layer].shape)
+                self.prev_total_grad_loss_b[layer] = np.zeros(self.nn_instance.b[layer].shape)
+        self.grad_update_first_time = 1
 
 
     def grad_update(self, grad_loss_W, grad_loss_b):
@@ -67,7 +79,7 @@ class momentum_gradient_descent:
                 self.total_grad_loss_W[layer] += grad_loss_W[layer]
                 self.total_grad_loss_b[layer] += grad_loss_b[layer]
         self.grad_update_first_time = 0
-        self.num_points_seen += 1        
+        self.num_points_seen += 1
 
 
     def step_update(self):
@@ -90,11 +102,6 @@ class momentum_gradient_descent:
         self.num_points_seen = 0
         self.total_grad_loss_W = dict()
         self.total_grad_loss_b = dict()
-        self.prev_total_grad_loss_W = dict()
-        self.prev_total_grad_loss_b = dict()
-        for layer in self.nn_instance.layers:
-                self.prev_total_grad_loss_W[layer] = np.zeros(self.nn_instance.W[layer].shape)
-                self.prev_total_grad_loss_b[layer] = np.zeros(self.nn_instance.b[layer].shape)
         self.grad_update_first_time = 1
 
 
