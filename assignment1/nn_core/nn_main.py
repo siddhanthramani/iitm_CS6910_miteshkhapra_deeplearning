@@ -4,6 +4,7 @@ from nn_core.nn_activations import *
 from nn_core.nn_loss import *
 from nn_core.nn_optimizer import *
 from nn_utils.output_utils import get_accuracy_metrics
+from nn_utils import constants
 
 class neural_network():
     # Epsilon is a small value which is added when we do not want a value to go to zero
@@ -75,41 +76,29 @@ class neural_network():
 
     # Backward propogation
     def __back_prop(self, a_i, h_i, y):
-        if self.loss_function == "cross_entropy":
-            # Check - our cross_entropy algo is optimized for softmax
-            if not self.__helper_get_activation_function(self.max_layer) == "softmax":
-                raise Exception("Cross entropy can be used only if the final activation function is softmax")
+        # Inits values
+        grad_loss_W = dict()
+        grad_loss_b = dict()
 
-            # Inits values
-            grad_loss_W = dict()
-            grad_loss_b = dict()
+        grad_loss_a = dict()
+        grad_loss_h = dict()
 
-            grad_loss_a = dict()
-            grad_loss_h = dict()
-
-            # Inits the pre_activation grad wrt output for max layer (final layer)
-            grad_loss_a[self.max_layer] = grad_wrt_output(y, h_i[self.max_layer]
-                                                , self.__helper_get_activation_function(self.max_layer))            
-            # Loops through each layer in reverse
-            for grad_layer in self.layers[::-1]:
-                grad_loss_W[grad_layer] = np.dot(grad_loss_a[grad_layer], np.transpose(h_i[grad_layer-1]))
-                grad_loss_b[grad_layer] = grad_loss_a[grad_layer]
-                
-                # If layer becomes equal to 1, we do not have to calc the 0th layer h, a
-                if grad_layer == 1:
-                    break
-                
-                grad_loss_h[grad_layer-1] = np.dot(np.transpose(self.W[grad_layer]), grad_loss_a[grad_layer])
-                grad_loss_a[grad_layer-1] = np.multiply(grad_loss_h[grad_layer-1], 
-                                                        grad_activation(a_i[grad_layer-1], 
-                                                                        self.__helper_get_activation_function(grad_layer-1)))
-
-        elif self.loss_function == "squared_error":
-            loss = np.sum(np.square(h_i[max(self.layers)] - y))
-            grad_loss_h = dict()
-            grad_loss_W = dict()
-            grad_loss_b = dict()
-            print("THIS HAS NOT BEEN CODED YET")
+        # Inits the pre_activation grad wrt output for max layer (final layer)
+        grad_loss_a[self.max_layer] = grad_wrt_output(y, h_i[self.max_layer], self.loss_function
+                                            , self.__helper_get_activation_function(self.max_layer))            
+        # Loops through each layer in reverse
+        for grad_layer in self.layers[::-1]:
+            grad_loss_W[grad_layer] = np.dot(grad_loss_a[grad_layer], np.transpose(h_i[grad_layer-1]))
+            grad_loss_b[grad_layer] = grad_loss_a[grad_layer]
+            
+            # If layer becomes equal to 1, we do not have to calc the 0th layer h, a
+            if grad_layer == 1:
+                break
+            
+            grad_loss_h[grad_layer-1] = np.dot(np.transpose(self.W[grad_layer]), grad_loss_a[grad_layer])
+            grad_loss_a[grad_layer-1] = np.multiply(grad_loss_h[grad_layer-1], 
+                                                    grad_activation(a_i[grad_layer-1], 
+                                                                    self.__helper_get_activation_function(grad_layer-1)))
 
         return grad_loss_W, grad_loss_b 
 
@@ -169,7 +158,7 @@ class neural_network():
         
         for x_i, y in zip(epoch_x, epoch_y): 
             y = self.__helper_get_one_hot_encoded_y(y)
-            epoch_loss.append(get_loss(y, self.__predict_single_input(x_i), self.loss_function, self.epsilon))
+            epoch_loss.append(get_loss(y, self.__predict_single_input(x_i), self.loss_function, constants.epsilon))
         
         y_pred = self.predict(epoch_x)
         accuracy_metrics = get_accuracy_metrics(epoch_y, y_pred)

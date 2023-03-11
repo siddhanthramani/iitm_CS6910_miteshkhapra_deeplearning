@@ -24,13 +24,13 @@ do_checks(X_val, y_val)
 do_checks(X_test, y_test)
 
 # WandB
-with open('wandb_config.json') as f:
-    wandb_config = json.load(f)
-wandb.init(config=)
+# with open('wandb_config.json') as f:
+#     wandb_config = json.load(f)
+# wandb.init(config=wandb_config)
 
-# Printing a basic image
-wandb.log({"Examples": [wandb.Image(img, caption=caption) 
-                        for img, caption in zip(set_images, set_labels)]})
+# # Printing a basic image
+# wandb.log({"Examples": [wandb.Image(img, caption=caption) 
+#                         for img, caption in zip(set_images, set_labels)]})
 
 # Defining the network structure
 num_neurons_dict = {0:28*28, 1:10, 2:10}
@@ -41,9 +41,10 @@ nn1 = neural_network(num_neurons_dict, activation_dict, nn_init=xavier_init, wei
 # Fitting the data to the model
 # optimizer = regular_gradient_descent(nn1, eta=0.00001)
 # optimizer = nestrov_accelerated_gradient_descent(nn1, eta=0.00001, beta=0.9)
-# optimizer = RMSProp(nn1, eta=0.001, beta=0.9)
-optimizer = NAdam(nn1, eta=0.001, beta1=0.9, beta2=0.99)
-list_validation_loss, list_validation_accuracy = nn1.fit(optimizer, X_train, y_train, X_val, y_val, epochs=50, minibatch_size = 0)
+optimizer = Adadelta(nn1, eta=0.001, beta=0.9)
+# optimizer = NAdam(nn1, eta=0.001, beta1=0.9, beta2=0.99)
+list_validation_loss, list_validation_accuracy = nn1.fit(optimizer, X_train, y_train, X_val
+                                                         , y_val, epochs=50, minibatch_size = 0)
 # nn1.fit(data["train_X"]/255, data["train_y"], gradient_descent_type = "momentum", eta=0.0001, beta = 0.09, epochs=20, minibatch_size = 128)
 
 # Checking for accuracy
