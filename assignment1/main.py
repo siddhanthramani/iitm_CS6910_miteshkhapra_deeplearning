@@ -6,7 +6,9 @@ from nn_core.nn_optimizer import *
 from nn_user.weight_init import xavier_init
 import numpy as np
 from sklearn.model_selection import train_test_split
+import json
 
+import wandb
 
 # Loading the data
 data = load()
@@ -20,6 +22,15 @@ y_test = data["test_y"]
 do_checks(X_train, y_train)
 do_checks(X_val, y_val)
 do_checks(X_test, y_test)
+
+# WandB
+with open('wandb_config.json') as f:
+    wandb_config = json.load(f)
+wandb.init(config=)
+
+# Printing a basic image
+wandb.log({"Examples": [wandb.Image(img, caption=caption) 
+                        for img, caption in zip(set_images, set_labels)]})
 
 # Defining the network structure
 num_neurons_dict = {0:28*28, 1:10, 2:10}
