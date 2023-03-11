@@ -13,15 +13,8 @@ class regular_gradient_descent:
 
     def grad_update(self, grad_loss_W, grad_loss_b):
         for layer in self.nn_instance.layers:
-            # For first time update, we init accumalated value
-            if self.grad_update_first_time:
-                self.total_grad_loss_W[layer] = grad_loss_W[layer]
-                self.total_grad_loss_b[layer] = grad_loss_b[layer]
-            # For all other times, we accumulate the gradient
-            else:
-                self.total_grad_loss_W[layer] += grad_loss_W[layer]
-                self.total_grad_loss_b[layer] += grad_loss_b[layer]
-        self.grad_update_first_time = 0
+            self.total_grad_loss_W[layer] += grad_loss_W[layer]
+            self.total_grad_loss_b[layer] += grad_loss_b[layer]
         self.num_points_seen += 1        
 
 
@@ -40,7 +33,9 @@ class regular_gradient_descent:
         self.num_points_seen = 0
         self.total_grad_loss_W = dict()
         self.total_grad_loss_b = dict()
-        self.grad_update_first_time = 1
+        for layer in self.nn_instance.layers:
+            self.total_grad_loss_W[layer] = np.zeros(self.nn_instance.W[layer].shape)
+            self.total_grad_loss_b[layer] = np.zeros(self.nn_instance.b[layer].shape)
 
 
 
@@ -117,7 +112,18 @@ class nestrov_accelerated_gradient_descent:
         self.eta = eta
         self.nn_instance = neural_network_instance
         self.step_update_first_time = 1
-        self.step_reset()
+        self.setup()
+
+    def setup(self):
+        self.num_points_seen = 0
+        self.total_grad_loss_W = dict()
+        self.total_grad_loss_b = dict()
+        self.prev_total_grad_loss_W = dict()
+        self.prev_total_grad_loss_b = dict()
+        for layer in self.nn_instance.layers:
+                self.prev_total_grad_loss_W[layer] = np.zeros(self.nn_instance.W[layer].shape)
+                self.prev_total_grad_loss_b[layer] = np.zeros(self.nn_instance.b[layer].shape)
+        self.grad_update_first_time = 1
 
 
     def grad_update(self, grad_loss_W, grad_loss_b):
@@ -162,16 +168,11 @@ class nestrov_accelerated_gradient_descent:
 
         self.step_reset()
 
-
+            
     def step_reset(self):
         self.num_points_seen = 0
         self.total_grad_loss_W = dict()
         self.total_grad_loss_b = dict()
-        self.prev_total_grad_loss_W = dict()
-        self.prev_total_grad_loss_b = dict()
-        for layer in self.nn_instance.layers:
-                self.prev_total_grad_loss_W[layer] = np.zeros(self.nn_instance.W[layer].shape)
-                self.prev_total_grad_loss_b[layer] = np.zeros(self.nn_instance.b[layer].shape)
         self.grad_update_first_time = 1
 
 
