@@ -1,7 +1,7 @@
 {
     "method": "random",
     "metric": {
-        "name": "accuracy",
+        "name": "test_accuracy",
         "goal": "maximize"
     },
     "parameters": {

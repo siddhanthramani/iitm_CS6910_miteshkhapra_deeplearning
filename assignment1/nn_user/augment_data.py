@@ -1,32 +1,31 @@
 import numpy as np
-import scipy
 from scipy.ndimage import rotate
 from copy import deepcopy
 import random
+from tqdm import tqdm
+import albumentations as A
 
-def rotate_img(X, y, max_angle=30, percent=0.1, bg_patch=(5,5)):
-    X_new = np.zeros(X.shape())
-    y_new = np.zeros(y.shape())
+x_shape = (1, 784, 1)
+transform = A.Compose([
+    A.HorizontalFlip(p=0.5),
+    A.RandomBrightnessContrast(p=0.2),
+])
+
+def augment_data(X, y, mode="replace", albumentation_transformer=transform):
+    first_index = 1
+    for img, true_value in tqdm(zip(X, y)):
+        new_img = albumentation_transformer(image=img)['image']
+        if first_index:
+            X_new = new_img.reshape(x_shape)
+            y_new = true_value
+            first_index = 0
+        else:
+            X_new = np.append(X_new, new_img.reshape(x_shape), axis=0)
+            y_new = np.append(y_new, true_value)
     
-    for img, true_value in zip(X, y):
-        rint = random.randint(0, 1)
-        if not rint < percent:
-            continue
-        else:
-            angle = random.randint(0, max_angle)
-
-        assert len(img.shape) <= 3, "Incorrect image shape"
-        rgb = len(img.shape) == 3
-        if rgb:
-            bg_color = np.mean(img[:bg_patch[0], :bg_patch[1], :], axis=(0,1))
-        else:
-            bg_color = np.mean(img[:bg_patch[0], :bg_patch[1]])
-        
-        img_copy = deepcopy(img)
-        img_copy = rotate(img_copy, angle, reshape=False)
-        mask = [img_copy <= 0, np.any(img_copy <= 0, axis=-1)][rgb]
-        img_copy[mask] = bg_color
-        X = np.append(X, img_copy)
-        y = np.append(y, true_value)
-
-    return X, y
+    if mode == "append":
+        X = np.append(X, X_new)
+        y = np.append(y, y_new)
+        return X, y
+    else:
+        return X_new, y_new

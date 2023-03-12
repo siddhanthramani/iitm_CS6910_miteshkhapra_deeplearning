@@ -146,44 +146,45 @@ class neural_network():
                 optimizer.step_update()
 
 
-    def __validate(self, train_x, train_y, val_x=None, val_y=None):
-        # Epoch init
-        epoch_loss = list()
-        if val_x is not None and val_y is not None:
-            epoch_x = val_x
-            epoch_y = val_y
-        else:
-            epoch_x = train_x
-            epoch_y = train_y
-        
-        for x_i, y in zip(epoch_x, epoch_y): 
+    def __helper_loss_accuracy(self, loss_acc_X, loss_acc_y):
+        loss = list()
+        for x_i, y in zip(loss_acc_X, loss_acc_y): 
             y = self.__helper_get_one_hot_encoded_y(y)
-            epoch_loss.append(get_loss(y, self.__predict_single_input(x_i), self.loss_function, constants.epsilon))
+            loss.append(get_loss(y, self.__predict_single_input(x_i), self.loss_function, constants.epsilon))
         
-        y_pred = self.predict(epoch_x)
-        accuracy_metrics = get_accuracy_metrics(epoch_y, y_pred)
+        y_pred = self.predict(loss_acc_X)
+        accuracy_metrics = get_accuracy_metrics(loss_acc_y, y_pred)
+        loss, accuracy = (round(np.average(np.array(loss)), 4)
+                                , round(accuracy_metrics[0], 4))
 
-        return (round(np.average(np.array(epoch_loss)), 4)
-                , round(accuracy_metrics[0], 4))
+        return loss, accuracy
+    
+    def __validate(self, train_x, train_y, val_x, val_y):
+        train_loss, train_accuracy = self.__helper_loss_accuracy(train_x, train_y)
+        val_loss, val_accuracy = self.__helper_loss_accuracy(val_x, val_y)
 
+        return train_loss, train_accuracy, val_loss, val_accuracy
+        
 
-    def fit(self, optimizer, train_x, train_y, val_x=None, val_y=None
+    def fit(self, wandb_tracker, optimizer, train_x, train_y, val_x=None, val_y=None
             , minibatch_size=0, epochs=1):
-        list_validation_loss = []
-        list_validation_accuracy = []
         for epoch in range(epochs):   
             # Train
             self.__train(train_x, train_y, optimizer, minibatch_size)
             
             # Validate
-            validation_loss, validation_accuracy = self.__validate(train_x, train_y, val_x, val_y)
-            print("Epoch - {}\tValidation Loss - {}\tValidation Accuracy - {}"
-                  .format(epoch+1, validation_loss, validation_accuracy))
-            list_validation_loss.append(validation_loss)
-            list_validation_accuracy.append(validation_accuracy)
+            train_loss, train_accuracy, val_loss, val_accuracy = self.__validate(train_x, train_y, val_x, val_y)
+            print("Epoch - {}\tTrain Loss - {}\tTrain Accuracy - {}\tValidation Loss - {}\tValidation Accuracy - {}"
+                  .format(epoch+1, train_loss, train_accuracy, val_loss, val_accuracy))
+
+            # Wandb Log
+            wandb_tracker.log({"epoch" : epoch+1
+                            , "train_loss" : train_loss
+                            , "train_accuracy" : train_accuracy
+                            , "val_loss" : val_loss
+                            , "val_accuracy" : val_accuracy})
 
         print("Model fitting is over.")
-        return list_validation_loss, list_validation_accuracy
 
 
     def __predict_single_input(self, single_input_x):
