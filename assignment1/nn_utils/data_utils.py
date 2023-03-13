@@ -1,7 +1,7 @@
 import gzip
 import numpy as np
 import time
-
+import wandb
 import random
 import matplotlib.pyplot as plt
 
@@ -76,8 +76,12 @@ def do_checks(X_check, y_check):
             print(np.isfinite(x), np.isfinite(y))
             break
 
-
 if __name__ == "__main__":
+    wandb.init(project="sweep_test")
+
+    # WandB plot sample image
     data = load()
     plt = plot_random_image_per_class(data)
-    plt.savefig("../sample3.jpg")
+    wandb.log({"img": [wandb.Image(plt)]})
+
+    wandb.finish()

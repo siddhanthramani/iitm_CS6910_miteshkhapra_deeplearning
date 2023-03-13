@@ -22,14 +22,14 @@
         },
         "optimizer": {
             "values": ["regular_gradient_descent", "momentum_gradient_descent"
-                        , "nestrov_accelerated_gradient_descent", "RMSProp"
-                        , "Adam", "NAdam"]
+                        , "nestrov_accelerated_gradient_descent", "rmsprop"
+                        , "adam", "nadam"]
         },
         "batch_size": {
             "values": [16, 32, 64]
         },
         "weight_init": {
-            "values": ["random", "Xavier"]
+            "values": ["random", "xavier"]
         },
         "activation_function": {
             "values" : ["sigmoid", "tanh", "relu"]

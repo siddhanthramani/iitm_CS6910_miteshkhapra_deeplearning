@@ -12,8 +12,7 @@ class neural_network():
 
     # The init function contains the instance variables and methods
     def __init__(self, num_neurons_dict, activation_dict, activation_type="constant"
-                 , loss_function="cross_entropy" , nn_init=np.random.rand, nn_init_random_max=1
-                 , **nn_init_params):
+                 , loss_function="cross_entropy" , nn_init=np.random.rand, nn_init_random_max=1):
         
         # setting up the neural architecture
         self.num_neurons_dict = num_neurons_dict
@@ -32,8 +31,8 @@ class neural_network():
         for layer, num_neurons in sorted(num_neurons_dict.items()):
             if layer == 0:
                 continue
-            self.W[layer] = nn_init(num_neurons, num_neurons_dict[layer-1], **nn_init_params) * nn_init_random_max
-            self.b[layer] = nn_init(num_neurons, 1, **nn_init_params) * nn_init_random_max
+            self.W[layer] = nn_init(num_neurons, num_neurons_dict[layer-1], "w") * nn_init_random_max
+            self.b[layer] = nn_init(num_neurons, 1, "b") * nn_init_random_max
         
 
     # A helper function used to get the activation function of a particular layer
