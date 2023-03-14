@@ -21,7 +21,9 @@
             "values": [1e-2]
         },
         "optimizer": {
-            "values": ["regular_gradient_descent", "nadam"]
+            "values": ["regular_gradient_descent", "momentum_gradient_descent"
+                        , "nestrov_accelerated_gradient_descent", "rmsprop"
+                        , "adam", "nadam"]
         },
         "batch_size": {
             "values": [64]
@@ -30,7 +32,7 @@
             "values": ["xavier"]
         },
         "activation_function": {
-            "values" : ["relu"]
+            "values" : ["logistic", "tanh", "relu"]
         }
     }
 }

@@ -59,10 +59,10 @@ def main():
     nn1 = neural_network(dict_neural_network_structure, activation_dict, nn_init=wandb_initializer[weight_init])
     
     # Defining the optimizer
-    optimizer = wandb_optimizer[optimizer](nn1, eta=learning_rate, **wandb_optimizer_params[optimizer])
+    optimizer = wandb_optimizer[optimizer](nn1, eta=learning_rate, weight_decay=weight_decay, **wandb_optimizer_params[optimizer])
     
     # Fitting the model
-    nn1.fit(wandb, optimizer, X_train, y_train, X_val, y_val, epochs=epochs, minibatch_size = batch_size)
+    nn1.fit(wandb, optimizer, X_train, y_train, X_val, y_val, epochs=epochs, minibatch_size=batch_size)
     
     # Checking for accuracy
     output = nn1.predict(X_test)
