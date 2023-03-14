@@ -8,7 +8,7 @@ _wandb:
     is_jupyter_run: false
     is_kaggle_kernel: false
     python_version: 3.7.9
-    start_time: 1678805444.562109
+    start_time: 1678805900.448061
     t:
       1:
       - 5
@@ -31,28 +31,28 @@ _wandb:
       - 5
 activation_function:
   desc: null
-  value: logistic
+  value: tanh
 batch_size:
   desc: null
-  value: 0
+  value: 64
 epochs:
   desc: null
-  value: 5
+  value: 10
 learning_rate:
   desc: null
   value: 0.01
 number_of_hidden_layers:
   desc: null
-  value: 5
+  value: 4
 optimizer:
   desc: null
-  value: adam
+  value: rmsprop
 size_of_every_hidden_layer:
   desc: null
-  value: 64
+  value: 32
 weight_decay:
   desc: null
-  value: 0.0005
+  value: 0.005
 weight_init:
   desc: null
   value: xavier

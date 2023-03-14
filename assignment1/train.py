@@ -27,10 +27,10 @@ general_params_parser.add_argument("-e", "--epochs", type=int, default=1
 general_params_parser.add_argument("-b", "--batch_size", type=int, default=4
                     , help="Batch size used to train neural network."
                     , metavar="batch_size")
-general_params_parser.add_argument("-l", "--loss", type=str, default="cross_entropy", choices=["mean_mean_squared_error", "cross_entropy"]
+general_params_parser.add_argument("-l", "--loss", type=str, default="cross_entropy", choices=["mean_squared_error", "cross_entropy"]
                     , help="Loss function to optimize the model on."
                     , metavar="loss_function")
-general_params_parser.add_argument("-w_i", "--weight_init", type=str, default="random", choices=["random", "Xavier"]
+general_params_parser.add_argument("-w_i", "--weight_init", type=str, default="random", choices=["random", "xavier"]
                     , help="Weight and bias initialization method."
                     , metavar="weight_init")
 
