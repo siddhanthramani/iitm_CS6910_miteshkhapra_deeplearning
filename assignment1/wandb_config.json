@@ -32,7 +32,7 @@
             "values": ["random", "xavier"]
         },
         "activation_function": {
-            "values" : ["sigmoid", "tanh", "relu"]
+            "values" : ["logistic", "tanh", "relu"]
         }
     }
 }

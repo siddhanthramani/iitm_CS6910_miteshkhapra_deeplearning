@@ -1,9 +1,11 @@
 import numpy as np
 from nn_utils.math_utils import numerically_stable_logistic, numerically_stable_softmax
 
+str_error_softmax = "Error: The activation of last layer must be softmax"
+
 # Forward activation functions
 def forward_activation(a_input, activation):
-    if activation == "linear":
+    if activation == "identity":
         return a_input
     
     elif activation == "logistic":
@@ -21,7 +23,7 @@ def forward_activation(a_input, activation):
 
 # Gradients wrt activation layer
 def grad_activation(a_input, activation):
-    if activation == "linear":
+    if activation == "identity":
         return 1
     
     elif activation == "logistic":
@@ -42,6 +44,11 @@ def grad_wrt_output(y, y_pred, loss_function, activation):
     if loss_function == "cross_entropy":
         if activation == "softmax":
             return - (y - y_pred)
-    elif loss_function == "squared_error":
+        else:
+            print(str_error_softmax)
+    elif loss_function == "mean_squared_error":
         if activation == "softmax":
             return (y_pred - y) * y_pred * (1 - y_pred)
+        else:
+            print(str_error_softmax)
+

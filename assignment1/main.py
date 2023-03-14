@@ -74,7 +74,7 @@ def main():
 if __name__ == "__main__":
 
     # Loading the data
-    data = load()
+    data = load(dataset="mnist")
     X = data["train_X"]/255
     y = data["train_y"]
     X_train, X_val, y_train, y_val = train_test_split(X, y, random_state=0)

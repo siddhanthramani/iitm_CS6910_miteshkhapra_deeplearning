@@ -7,21 +7,21 @@ import matplotlib.pyplot as plt
 
 dimensions = (28, 28)
 
-def load(path = "../data/"):
+def load(path = "../data/", dataset="fashionmnist"):
     t0 = time.time()
-    print("Loading fashionmnist")
+    print(f"Loading {dataset}")
 
-    with gzip.open(path + "fashionmnist/train-labels.gz", "rb") as lbpath:
+    with gzip.open(path + f"{dataset}/train-labels.gz", "rb") as lbpath:
         train_labels = np.frombuffer(lbpath.read(), dtype=np.uint8, offset=8)
 
-    with gzip.open(path + "fashionmnist/train-images.gz", "rb") as lbpath:
+    with gzip.open(path + f"{dataset}/train-images.gz", "rb") as lbpath:
         train_images = np.frombuffer(lbpath.read(), dtype=np.uint8, offset=16)
     train_images = train_images.reshape((-1, 1, 28, 28)).astype("float32")
 
-    with gzip.open(path + "fashionmnist/test-labels.gz", "rb") as lbpath:
+    with gzip.open(path + f"{dataset}/test-labels.gz", "rb") as lbpath:
         test_labels = np.frombuffer(lbpath.read(), dtype=np.uint8, offset=8)
 
-    with gzip.open(path + "fashionmnist/test-images.gz", "rb") as lbpath:
+    with gzip.open(path + f"{dataset}/test-images.gz", "rb") as lbpath:
         test_images = np.frombuffer(lbpath.read(), dtype=np.uint8, offset=16)
     test_images = test_images.reshape((-1, 1, 28, 28)).astype("float32")
     
