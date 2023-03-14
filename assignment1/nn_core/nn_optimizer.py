@@ -5,8 +5,9 @@ import math
 
 class regular_gradient_descent:
 
-    def __init__(self, neural_network_instance, eta):
+    def __init__(self, neural_network_instance, eta, weight_decay=0.0):
         self.eta = eta
+        self.weight_decay = weight_decay
         self.nn_instance = neural_network_instance
         self.step_reset()
 
@@ -20,12 +21,14 @@ class regular_gradient_descent:
 
     def step_update(self):
         for layer in self.nn_instance.layers:
-            W_eta_shape = self.nn_instance.W[layer].shape
-            b_eta_shape = self.nn_instance.b[layer].shape
+            W_shape = self.nn_instance.W[layer].shape
+            b_shape = self.nn_instance.b[layer].shape
             
-            self.nn_instance.W[layer] -= np.multiply(np.full(W_eta_shape, self.eta), self.total_grad_loss_W[layer])
-            self.nn_instance.b[layer] -= np.multiply(np.full(b_eta_shape, self.eta), self.total_grad_loss_b[layer])
-        
+            self.nn_instance.W[layer] -= np.multiply(np.full(W_shape, self.eta), self.total_grad_loss_W[layer])\
+                                        - np.multiply(np.full(W_shape, self.eta * self.weight_decay), self.nn_instance.W[layer])
+            self.nn_instance.b[layer] -= np.multiply(np.full(b_shape, self.eta), self.total_grad_loss_b[layer])
+            
+
         self.step_reset()
 
 
@@ -42,11 +45,12 @@ class regular_gradient_descent:
 
 class momentum_gradient_descent:
 
-    def __init__(self, neural_network_instance, eta, beta):
+    def __init__(self, neural_network_instance, eta, beta, weight_decay=0.0):
         if (beta < 0 or beta >= 1):
             print("WARNING : Beta value is not between 0 (inclusive) and 1")
         self.beta = beta
         self.eta = eta
+        self.weight_decay = weight_decay
         self.nn_instance = neural_network_instance
         self.setup()
 
@@ -77,7 +81,8 @@ class momentum_gradient_descent:
             b_shape = self.nn_instance.b[layer].shape
 
             self.prev_total_grad_loss_W[layer] = np.add(np.multiply(np.full(W_shape, self.beta), self.prev_total_grad_loss_W[layer])
-                                                        , np.multiply(np.full(W_shape, self.eta), self.total_grad_loss_W[layer]))
+                                                        , np.multiply(np.full(W_shape, self.eta), self.total_grad_loss_W[layer]))\
+                                                        - np.multiply(np.full(W_shape, self.eta * self.weight_decay), self.nn_instance.W[layer])
             self.prev_total_grad_loss_b[layer] = np.add(np.multiply(np.full(b_shape, self.beta), self.prev_total_grad_loss_b[layer])
                                                         , np.multiply(np.full(b_shape, self.eta), self.total_grad_loss_b[layer]))
             
@@ -101,11 +106,12 @@ class momentum_gradient_descent:
 
 class nestrov_accelerated_gradient_descent:
 
-    def __init__(self, neural_network_instance, eta, beta):
+    def __init__(self, neural_network_instance, eta, beta, weight_decay=0.0):
         if (beta < 0 or beta >= 1):
             print("WARNING : Beta value is not between 0 (inclusive) and 1")
         self.beta = beta
         self.eta = eta
+        self.weight_decay = weight_decay
         self.nn_instance = neural_network_instance
         self.step_update_first_time = 1
         self.setup()
@@ -149,7 +155,9 @@ class nestrov_accelerated_gradient_descent:
             self.prev_total_grad_loss_b[layer] = np.add(np.multiply(np.full(b_shape, self.beta), self.prev_total_grad_loss_b[layer])
                                                         , np.multiply(np.full(b_shape, self.eta), self.total_grad_loss_b[layer]))
             
-            self.nn_instance.W[layer] -= self.prev_total_grad_loss_W[layer]
+            self.nn_instance.W[layer] -= self.prev_total_grad_loss_W[layer]\
+                                        - np.multiply(np.full(W_shape, self.eta * self.weight_decay), self.nn_instance.W[layer])
+
             self.nn_instance.b[layer] -= self.prev_total_grad_loss_b[layer]
             
             self.actual_W[layer] = deepcopy(self.nn_instance.W[layer])
@@ -173,11 +181,12 @@ class nestrov_accelerated_gradient_descent:
 
 class RMSProp:
 
-    def __init__(self, neural_network_instance, eta, beta):
+    def __init__(self, neural_network_instance, eta, beta, weight_decay=0.0):
         if (beta < 0 or beta >= 1):
             print("WARNING : Beta value is not between 0 (inclusive) and 1")
         self.beta = beta
         self.eta = eta
+        self.weight_decay = weight_decay
         self.nn_instance = neural_network_instance
         self.setup()
 
@@ -212,7 +221,9 @@ class RMSProp:
             self.prev_total_grad_loss_b[layer] = np.add(np.multiply(np.full(b_shape, self.beta), self.prev_total_grad_loss_b[layer])
                                                         , np.multiply(np.full(b_shape, (1-self.beta)), np.square(self.total_grad_loss_b[layer])))
             
-            self.nn_instance.W[layer] -= np.multiply(self.eta, self.total_grad_loss_W[layer]) / (np.sqrt(self.prev_total_grad_loss_W[layer]) + constants.epsilon)
+            self.nn_instance.W[layer] -= np.multiply(self.eta, self.total_grad_loss_W[layer]) / (np.sqrt(self.prev_total_grad_loss_W[layer]) + constants.epsilon)\
+                                        - np.multiply(np.full(W_shape, self.eta * self.weight_decay), self.nn_instance.W[layer])
+            
             self.nn_instance.b[layer] -= np.multiply(self.eta, self.total_grad_loss_b[layer]) / (np.sqrt(self.prev_total_grad_loss_b[layer]) + constants.epsilon)
         
         self.step_reset()
@@ -231,11 +242,12 @@ class RMSProp:
 
 class Adadelta:
 
-    def __init__(self, neural_network_instance, eta, beta):
+    def __init__(self, neural_network_instance, eta, beta, weight_decay=0.0):
         if (beta < 0 or beta >= 1):
             print("WARNING : Beta value is not between 0 (inclusive) and 1")
         self.beta = beta
         self.eta = eta
+        self.weight_decay = weight_decay
         self.nn_instance = neural_network_instance
         self.setup()
 
@@ -285,7 +297,8 @@ class Adadelta:
             self.total_grad_loss_ub[layer] = np.add(np.multiply(np.full(b_shape, self.beta), self.total_grad_loss_ub[layer])
                                                         , np.multiply(np.full(b_shape, (1-self.beta)), np.square(this_total_grad_loss_b[layer])))
             
-            self.nn_instance.W[layer] -= this_total_grad_loss_W[layer]
+            self.nn_instance.W[layer] -= this_total_grad_loss_W[layer]\
+                                        - np.multiply(np.full(W_shape, self.eta * self.weight_decay), self.nn_instance.W[layer])
             self.nn_instance.b[layer] -= this_total_grad_loss_b[layer]
         
         self.step_reset()
@@ -304,12 +317,13 @@ class Adadelta:
 
 class Adam:
 
-    def __init__(self, neural_network_instance, eta, beta1, beta2):
+    def __init__(self, neural_network_instance, eta, beta1, beta2, weight_decay=0.0):
         if ((beta1 < 0 or beta1 >= 1) or (beta2 < 0 or beta2 >= 1)):
             print("WARNING : Beta value is not between 0 (inclusive) and 1")
         self.beta1 = beta1
         self.beta2 = beta2
         self.eta = eta
+        self.weight_decay = weight_decay
         self.nn_instance = neural_network_instance
         self.step_update_count = 0
         self.setup()
@@ -365,7 +379,8 @@ class Adam:
             this_total_grad_loss_vW_hat[layer] = self.total_grad_loss_vW[layer]/ (1 - np.power(self.beta2, self.step_update_count + 1))
             this_total_grad_loss_vb_hat[layer] = self.total_grad_loss_vb[layer]/ (1 - np.power(self.beta2, self.step_update_count + 1))
             
-            self.nn_instance.W[layer] -= (self.eta * this_total_grad_loss_mW_hat[layer])/(np.sqrt(this_total_grad_loss_vW_hat[layer]) + constants.epsilon)
+            self.nn_instance.W[layer] -= (self.eta * this_total_grad_loss_mW_hat[layer])/(np.sqrt(this_total_grad_loss_vW_hat[layer]) + constants.epsilon)\
+                                        - np.multiply(np.full(W_shape, self.eta * self.weight_decay), self.nn_instance.W[layer])
             self.nn_instance.b[layer] -= (self.eta * this_total_grad_loss_mb_hat[layer])/(np.sqrt(this_total_grad_loss_vb_hat[layer]) + constants.epsilon)
         
         self.step_update_count += 1
@@ -385,12 +400,13 @@ class Adam:
 
 class NAdam:
 
-    def __init__(self, neural_network_instance, eta, beta1, beta2):
+    def __init__(self, neural_network_instance, eta, beta1, beta2, weight_decay=0.0):
         if ((beta1 < 0 or beta1 >= 1) or (beta2 < 0 or beta2 >= 1)):
             print("WARNING : Beta value is not between 0 (inclusive) and 1")
         self.beta1 = beta1
         self.beta2 = beta2
         self.eta = eta
+        self.weight_decay = weight_decay
         self.nn_instance = neural_network_instance
         self.step_update_count = 0
         self.setup()
@@ -449,7 +465,8 @@ class NAdam:
             self.nn_instance.W[layer] -= ((self.eta/np.sqrt(this_total_grad_loss_vW_hat[layer] + constants.epsilon)) *
                                           (np.add(self.beta1 * this_total_grad_loss_mW_hat[layer], 
                                             ((1-self.beta1) * self.total_grad_loss_W[layer]) / (1 - np.power(self.beta1, self.step_update_count + 1))
-                                            )))
+                                            )))\
+                                        - np.multiply(np.full(W_shape, self.eta * self.weight_decay), self.nn_instance.W[layer])
             self.nn_instance.b[layer] -= ((self.eta/np.sqrt(this_total_grad_loss_vb_hat[layer] + constants.epsilon)) *
                                           (np.add(self.beta1 * this_total_grad_loss_mb_hat[layer], 
                                             ((1-self.beta1) * self.total_grad_loss_b[layer]) / (1 - np.power(self.beta1, self.step_update_count + 1)))))
