@@ -32,7 +32,7 @@ def load(path = "../data/", dataset="fashionmnist"):
         "test_y": test_labels,
     }
 
-    print("Dataset {} loaded in {0:.2f}s.".format(dataset, time.time() - t0))
+    print("Dataset {0} loaded in {1:.2f}s.".format(dataset, time.time() - t0))
 
     return data
 
