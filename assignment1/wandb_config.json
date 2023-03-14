@@ -1,5 +1,5 @@
 {
-    "method": "random",
+    "method": "grid",
     "metric": {
         "name": "test_accuracy",
         "goal": "maximize"
@@ -9,16 +9,16 @@
             "values": [1]
         },
         "number_of_hidden_layers":{
-            "values" : [2]
+            "values" : [1]
         },
         "size_of_every_hidden_layer": {
-            "values": [16, 32, 64]
+            "values": [10]
         },
         "weight_decay": {
-            "values": [0, 0.05, 0.005, 0.0005]
+            "values": [0.05]
         },
         "learning_rate": {
-            "values": [1e-2, 1e-3, 1e-4, 1e-5]
+            "values": [1e-2]
         },
         "optimizer": {
             "values": ["regular_gradient_descent", "momentum_gradient_descent"
@@ -26,10 +26,10 @@
                         , "adam", "nadam"]
         },
         "batch_size": {
-            "values": [0, 64]
+            "values": [64]
         },
         "weight_init": {
-            "values": ["random", "xavier"]
+            "values": ["xavier"]
         },
         "activation_function": {
             "values" : ["logistic", "tanh", "relu"]

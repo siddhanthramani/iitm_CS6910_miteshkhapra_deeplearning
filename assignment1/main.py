@@ -93,5 +93,5 @@ if __name__ == "__main__":
     with open("./assignment1/wandb_config.json") as f:
         sweep_config = json.load(f)
     sweep_id = wandb.sweep(project="sweep_test", sweep=sweep_config)
-    wandb.agent(sweep_id, function=main, count=2)
+    wandb.agent(sweep_id, function=main, count=20)
 # data, X_train, X_val, X_test, y_train, y_val, y_test
