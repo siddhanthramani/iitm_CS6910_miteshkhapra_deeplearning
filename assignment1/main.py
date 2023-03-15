@@ -1,5 +1,5 @@
 # Imports required modules
-from nn_utils.data_utils import load, plot_random_image_per_class, do_checks
+from nn_utils.data_utils import load, plot_random_image_per_class, do_data_checks
 from nn_utils.output_utils import get_accuracy_metrics
 from nn_core.nn_main import neural_network
 from nn_core.nn_optimizer import *
@@ -82,9 +82,9 @@ if __name__ == "__main__":
     y_test = data["test_y"]
 
     # Checking the data for infinities or nans
-    do_checks(X_train, y_train)
-    do_checks(X_val, y_val)
-    do_checks(X_test, y_test)
+    do_data_checks(X_train, y_train)
+    do_data_checks(X_val, y_val)
+    do_data_checks(X_test, y_test)
 
     # Augment data - if required
     # X_train, y_train = augment_data(X_train, y_train, mode="replace")

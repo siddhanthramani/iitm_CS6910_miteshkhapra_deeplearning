@@ -69,7 +69,7 @@ def plot_random_image_per_class(data, from_dataset="train"):
     return plt
 
 
-def do_checks(X_check, y_check):
+def do_data_checks(X_check, y_check):
     for x, y in zip(X_check, y_check):
         y = np.array([1 if i==(y-1) else 0 for i in range(10)]).reshape(10, 1)
         if not (np.isfinite(x).all() or np.isfinite(y).all()):

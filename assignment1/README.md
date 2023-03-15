@@ -29,6 +29,12 @@ pipenv install
 
 Note : The code has been tested both on Windows 11  and native Ubuntu 22.0.4. It works!
 
+Create the folder structure as follows (TO BE FILLED)
+
+
+
+
+
 Useful tips for users
 Most libraries out there do not allow you to include your own algorithms and they default many hyperparameters.
 

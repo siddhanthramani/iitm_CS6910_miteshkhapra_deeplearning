@@ -1,0 +1,17 @@
+wandb_project="test_exp"
+wandb_entity="None"
+dataset="fashion_mnist"
+epochs=1
+batch_size=64
+loss="mean_squared_error"
+weight_init"xavier"
+optimizer="regular_gradient_descent"
+learning_rate=1e-5
+beta=0.9
+beta1=0.9
+beta2=0.99
+epsilon=1e-8
+weight_decay=0
+num_layers=1
+hidden_size=10
+activation="tanh"
