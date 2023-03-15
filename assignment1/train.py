@@ -89,12 +89,12 @@ def cli_parser():
                         , help="Weight decay used by optimizers."
                         , metavar="weight_decay")
 
-    nn_arch_parser.add_argument("-nhl", "--num_layers", type=int, default=1
+    nn_arch_parser.add_argument("-nhl", "--number_of_hidden_layers", type=int, default=1
                         , help="Number of hidden layers used in feedforward neural network."
                         , metavar="number_of_hidden_layers")
-    nn_arch_parser.add_argument("-sz", "--hidden_size", type=int, default=10
+    nn_arch_parser.add_argument("-sz", "--size_of_every_hidden_layer", type=int, default=10
                         , help="Number of hidden neurons in a feedforward layer."
-                        , metavar="size_of_hidden_layer")
+                        , metavar="size_of_every_hidden_layer")
     nn_arch_parser.add_argument("-a", "--activation", type=str, default="logistic", choices=["identity", "logistic", "tanh", "relu"]
                         , help="Activation function of each layer."
                         , metavar="activation_function")
@@ -104,30 +104,14 @@ def cli_parser():
         args = vars(parser.parse_args(['@{}'.format(args_path)]))
     else:
         args = vars(parser.parse_args())
-        
+
     print(args)
     return args
 
 if __name__ == "__main__":
+    # Get CLI params
     args = cli_parser()
 
-    # Loading the data
-    data = load()
-    X = data["train_X"]/255
-    y = data["train_y"]
-    X_train, X_val, y_train, y_val = train_test_split(X, y, random_state=0)
-    X_test = data["test_X"]/255
-    y_test = data["test_y"]
-
-    # Checking the data for infinities or nans
-    do_data_checks(X_train, y_train)
-    do_data_checks(X_val, y_val)
-    do_data_checks(X_test, y_test)
-
-    # Augment data - if required
-    # X_train, y_train = augment_data(X_train, y_train, mode="replace")
-
-    # Get CLI params
     wandb_project = args["wandb_project"]
     wandb_entity = args["wandb_entity"]
     dataset = args["dataset"]
@@ -142,8 +126,8 @@ if __name__ == "__main__":
     beta2 = args["beta2"]
     epsilon = args["epsilon"]
     weight_decay = args["weight_decay"]
-    num_layers = args["num_layers"]
-    hidden_size = args["hidden_size"]
+    number_of_hidden_layers = args["number_of_hidden_layers"]
+    size_of_every_hidden_layer = args["size_of_every_hidden_layer"]
     activation = args["activation"]
 
     # Setting optimizer hyperparameters as required
@@ -158,6 +142,22 @@ if __name__ == "__main__":
     # Setting epsilon value
     constants.epsilon = epsilon
 
+    # Loading the data
+    data = load(dataset)
+    X = data["train_X"]/255
+    y = data["train_y"]
+    X_train, X_val, y_train, y_val = train_test_split(X, y, random_state=0)
+    X_test = data["test_X"]/255
+    y_test = data["test_y"]
+
+    # Checking the data for infinities or nans
+    do_data_checks(X_train, y_train)
+    do_data_checks(X_val, y_val)
+    do_data_checks(X_test, y_test)
+
+    # Augment data - if required
+    # X_train, y_train = augment_data(X_train, y_train, mode="replace")
+
     # Start wandb
     if wandb_entity == "None":
         wandb.init(project=wandb_project)
@@ -167,15 +167,15 @@ if __name__ == "__main__":
     # Defining the network structure
     dict_neural_network_structure = {}
     dict_neural_network_structure[0] = 28*28
-    dict_neural_network_structure[num_layers + 1] = 10
-    for hidden_layer in range(1, num_layers + 1):
-        dict_neural_network_structure[hidden_layer] = hidden_size
+    dict_neural_network_structure[number_of_hidden_layers + 1] = 10
+    for hidden_layer in range(1, number_of_hidden_layers + 1):
+        dict_neural_network_structure[hidden_layer] = size_of_every_hidden_layer
     
     # Defining the activations
     activation_dict = {0 : activation, 1 : "softmax"}
     
     # Creating the neural network instance
-    nn1 = neural_network(dict_neural_network_structure, activation_dict, nn_init=wandb_initializer[weight_init])
+    nn1 = neural_network(dict_neural_network_structure, activation_dict, loss_function=loss, nn_init=wandb_initializer[weight_init])
     
     # Defining the optimizer
     optimizer = wandb_optimizer[optimizer](nn1, eta=learning_rate, weight_decay=weight_decay, **wandb_optimizer_params[optimizer])

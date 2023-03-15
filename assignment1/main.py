@@ -23,11 +23,11 @@ wandb_optimizer = {
 }
 wandb_optimizer_params = {
     "regular_gradient_descent" : {}
-    , "momentum_gradient_descent" : {"beta" : 0.9}
-    , "nestrov_accelerated_gradient_descent" : {"beta" : 0.9}
-    , "rmsprop" : {"beta" : 0.9}
-    , "adam" : {"beta1" : 0.9, "beta2" : 0.99}
-    , "nadam" : {"beta1" : 0.9, "beta2" : 0.99}
+    , "momentum_gradient_descent" : {}
+    , "nestrov_accelerated_gradient_descent" : {}
+    , "rmsprop" : {}
+    , "adam" : {}
+    , "nadam" : {}
 }
 
 def main():
@@ -36,14 +36,31 @@ def main():
 
     # Initialize wandb params
     epochs = wandb.config.epochs
-    number_of_hidden_layers = wandb.config.number_of_hidden_layers
-    size_of_every_hidden_layer = wandb.config.size_of_every_hidden_layer
-    weight_decay = wandb.config.weight_decay
-    learning_rate = wandb.config.learning_rate
-    optimizer = wandb.config.optimizer
     batch_size = wandb.config.batch_size
+    loss = wandb.config.loss
     weight_init = wandb.config.weight_init
+    optimizer = wandb.config.optimizer
+    learning_rate = wandb.config.learning_rate
+    beta = wandb.config.beta
+    beta1 = wandb.config.beta1
+    beta2 = wandb.config.beta2
+    epsilon = wandb.config.epsilon
+    weight_decay = wandb.config.weight_decay
+    number_of_hidden_layers = wandb.config.number_of_hidden_layers
+    size_of_every_hidden_layer = wandb.config.size_of_every_hidden_layer    
     activation_function = wandb.config.activation_function
+
+    # Setting optimizer hyperparameters as required
+    if optimizer in ["adam", "nadam"]:
+        wandb_optimizer_params[optimizer]["beta1"] = beta1
+        wandb_optimizer_params[optimizer]["beta2"] = beta2
+    elif optimizer in ["momentum_gradient_descent", "nestrov_accelerated_gradient_descent", "rmsprop"]:
+        wandb_optimizer_params[optimizer]["beta"] = beta
+    elif optimizer in ["regular_gradient_descent"]:
+        pass
+
+    # Setting epsilon value
+    constants.epsilon = epsilon
 
     # Defining the network structure
     dict_neural_network_structure = {}
@@ -56,7 +73,7 @@ def main():
     activation_dict = {0 : activation_function, 1 : "softmax"}
     
     # Creating the neural network instance
-    nn1 = neural_network(dict_neural_network_structure, activation_dict, nn_init=wandb_initializer[weight_init])
+    nn1 = neural_network(dict_neural_network_structure, activation_dict, loss_function=loss, nn_init=wandb_initializer[weight_init])
     
     # Defining the optimizer
     optimizer = wandb_optimizer[optimizer](nn1, eta=learning_rate, weight_decay=weight_decay, **wandb_optimizer_params[optimizer])
@@ -73,7 +90,7 @@ def main():
 
 if __name__ == "__main__":
 
-    # Loading the data
+    # Loading the data - Done before sweeps to prevent multiple time consuming calls
     data = load()
     X = data["train_X"]/255
     y = data["train_y"]
