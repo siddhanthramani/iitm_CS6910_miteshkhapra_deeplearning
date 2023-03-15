@@ -10,6 +10,7 @@ from sklearn.model_selection import train_test_split
 import json
 import wandb
 from argparse import ArgumentParser
+from nn_utils import constants
 
 wandb_initializer = {
     "random" : random_init
@@ -151,6 +152,9 @@ if __name__ == "__main__":
         wandb_optimizer_params[optimizer]["beta2"] = beta2
     else:
         wandb_optimizer_params[optimizer]["beta"] = beta
+
+    # Setting epsilon value
+    constants.epsilon = epsilon
 
     # Start wandb
     wandb.init(project=wandb_project, entity=wandb_entity)

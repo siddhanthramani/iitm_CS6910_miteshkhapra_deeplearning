@@ -90,7 +90,7 @@ if __name__ == "__main__":
     # X_train, y_train = augment_data(X_train, y_train, mode="replace")
     
     # WandB sweep
-    with open("./assignment1/wandb_config.json") as f:
+    with open("./assignment1/wandb_sweep_config.json") as f:
         sweep_config = json.load(f)
     sweep_id = wandb.sweep(project="sweep_test", sweep=sweep_config)
     wandb.agent(sweep_id, function=main, count=20)
