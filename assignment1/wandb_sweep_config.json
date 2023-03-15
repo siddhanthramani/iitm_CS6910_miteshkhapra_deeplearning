@@ -8,28 +8,43 @@
         "epochs": {
             "values": [10, 50]
         },
-        "number_of_hidden_layers":{
-            "values" : [1, 3, 4, 5]
+        "batch_size": {
+            "values": [0, 64]
         },
-        "size_of_every_hidden_layer": {
-            "values": [16, 64]
+        "loss": {
+            "values": ["mean_squared_error", "cross_entropy"]
         },
-        "weight_decay": {
-            "values": [0, 0.005]
-        },
-        "learning_rate": {
-            "values": [1e-2, 1e-5]
+        "weight_init": {
+            "values": ["xavier"]
         },
         "optimizer": {
             "values": ["regular_gradient_descent", "momentum_gradient_descent"
                         , "nestrov_accelerated_gradient_descent", "rmsprop"
                         , "adam", "nadam"]
         },
-        "batch_size": {
-            "values": [0, 64]
+        "learning_rate": {
+            "values": [1e-2, 1e-5]
         },
-        "weight_init": {
-            "values": ["xavier"]
+        "beta": {
+            "values": [0.9]
+        },
+        "beta1": {
+            "values": [0.9]
+        },
+        "beta2": {
+            "values": [0.99]
+        },
+        "epsilon": {
+            "values": [1e-8]
+        },
+        "weight_decay": {
+            "values": [0, 0.005]
+        },
+        "number_of_hidden_layers":{
+            "values" : [1, 3, 4, 5]
+        },
+        "size_of_every_hidden_layer": {
+            "values": [16, 64]
         },
         "activation_function": {
             "values" : ["logistic", "tanh", "relu"]
