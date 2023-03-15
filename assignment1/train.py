@@ -1,12 +1,13 @@
 # Imports required modules
 from nn_utils.data_utils import load, plot_random_image_per_class, do_data_checks
-from nn_utils.output_utils import get_accuracy_metrics
+from nn_utils.output_utils import get_accuracy_metrics, plot_confusion_matrix
 from nn_core.nn_main import neural_network
 from nn_core.nn_optimizer import *
 from nn_user.weight_init import *
 from nn_user.augment_data import augment_data
 from sklearn.model_selection import train_test_split
 import wandb
+import os
 from argparse import ArgumentParser
 from nn_utils import constants
 
@@ -98,8 +99,13 @@ def cli_parser():
                         , help="Activation function of each layer."
                         , metavar="activation_function")
 
-
-    args = vars(parser.parse_args())
+    args_path = "./assignment1/wandb_expt_args.txt"
+    if os.path.isfile(args_path):
+        args = vars(parser.parse_args(['@{}'.format(args_path)]))
+    else:
+        args = vars(parser.parse_args())
+        
+    print(args)
     return args
 
 if __name__ == "__main__":
@@ -183,5 +189,5 @@ if __name__ == "__main__":
     for val in accuracy_metrics:
         print(val*100)
         wandb.log({"test_accuracy" : val*100})
-
+    plot_confusion_matrix(wandb, y_test, output)
     wandb.finish()

@@ -1,5 +1,7 @@
 from sklearn.metrics import confusion_matrix
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
+import pandas as pd
+import matplotlib.pyplot as plt
 
 def get_accuracy_metrics(y_true, y_pred, micron_on=0,
                         macro_on=0, weighted_on=0, confusion_on=0):
@@ -39,3 +41,13 @@ def get_accuracy_metrics(y_true, y_pred, micron_on=0,
 
 def plot_validation_metrics(list_validation_loss, list_validation_accuracy):
     pass
+
+def plot_confusion_matrix(wandb, y_true, y_pred):
+    df = pd.DataFrame({"y_true" : y_true, "y_pred" : y_pred})
+    a = df.groupby(["y_true", "y_pred"]).agg(count=("y_pred", "count")).reset_index()
+    b = df.groupby("y_true").agg(total=("y_true", "count")).reset_index()
+    c = pd.merge(a, b, on="y_true")
+    c["percent"] = c["count"]/c["total"]
+    c[["y_true", "y_pred", "percent"]].sort_values(["y_true", "percent"], ascending=[True, False])
+    plt.scatter(c["y_true"], c["y_pred"], s=c["percent"]*10)
+    wandb.log({"confusion matrix": [wandb.Image(plt)]})
