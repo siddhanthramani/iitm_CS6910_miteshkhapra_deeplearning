@@ -6,6 +6,6 @@ def get_loss(y, y_pred, loss_function, epsilon = constants.epsilon):
         loss = -np.sum(np.multiply(y, np.log(y_pred + epsilon)))
 
     elif loss_function == "mean_squared_error":
-        loss = np.sum(np.square(np.linalg.norm(y_pred - y)))
+        loss = np.sum(np.square(np.subtract(y_pred, y)).mean())
     
     return loss

@@ -7,8 +7,6 @@ from nn_utils.output_utils import get_accuracy_metrics
 from nn_utils import constants
 
 class neural_network():
-    # Epsilon is a small value which is added when we do not want a value to go to zero
-    epsilon = 0.0001
 
     # The init function contains the instance variables and methods
     def __init__(self, num_neurons_dict, activation_dict, activation_type="constant"
@@ -55,6 +53,7 @@ class neural_network():
         return activation
 
 
+    # A helper function which converts "y" (a specific class), to a one-hot encoded vector
     def __helper_get_one_hot_encoded_y(self, y):
         return np.array([1 if i==(y-1) else 0 for i in range(self.number_of_classes)]).reshape(self.number_of_classes, 1)
 
@@ -65,6 +64,7 @@ class neural_network():
         h_i = dict()
         # For clean code - Activated 0th layer equated to input
         h_i[0] = x_i
+        # For each layer, compute a(i) and h(i), where a(i) is pre-activated neuron value and h(i) is activated neuron value
         for layer in self.layers:
             a_i[layer] = np.add(np.dot(self.W[layer], h_i[layer-1]), self.b[layer])
             activation = self.__helper_get_activation_function(layer)
@@ -85,12 +85,12 @@ class neural_network():
         # Inits the pre_activation grad wrt output for max layer (final layer)
         grad_loss_a[self.max_layer] = grad_wrt_output(y, h_i[self.max_layer], self.loss_function
                                             , self.__helper_get_activation_function(self.max_layer))            
-        # Loops through each layer in reverse
+        # Loops through each layer in reverse and gets the gradient values of weights and biases
         for grad_layer in self.layers[::-1]:
             grad_loss_W[grad_layer] = np.dot(grad_loss_a[grad_layer], np.transpose(h_i[grad_layer-1]))
             grad_loss_b[grad_layer] = grad_loss_a[grad_layer]
             
-            # If layer becomes equal to 1, we do not have to calc the 0th layer h, a
+            # If layer becomes equal to 1, we do not have to calculate the h, a of 0th layer  - as that is only X(the input)
             if grad_layer == 1:
                 break
             
@@ -102,49 +102,24 @@ class neural_network():
         return grad_loss_W, grad_loss_b 
 
 
-    def __momentum_step_update(self, global_grad_loss_W, global_grad_loss_b):
-        if self.step_update_first_time == 1:
-            self.prev_global_grad_loss_W = dict()
-            self.prev_global_grad_loss_b = dict()
-            for layer in self.layers:
-                self.prev_global_grad_loss_W[layer] = np.zeros(self.W[layer].shape)
-                self.prev_global_grad_loss_b[layer] = np.zeros(self.b[layer].shape)
-            self.step_update_first_time == 0
-        
-        u_W = dict()
-        u_b = dict()
-        for layer in self.layers:
-            W_shape = self.W[layer].shape
-            b_shape = self.b[layer].shape
-
-            u_W[layer] = np.add(np.multiply(np.full(W_shape, self.param_dict["beta"]), self.prev_global_grad_loss_W[layer])
-                            , global_grad_loss_W[layer])
-            u_b[layer] = np.add(np.multiply(np.full(b_shape, self.param_dict["beta"]), self.prev_global_grad_loss_b[layer])
-                            , global_grad_loss_b[layer])
-            
-            self.W[layer] -= np.multiply(np.full(W_shape, self.param_dict["eta"]), u_W[layer])
-            self.b[layer] -= np.multiply(np.full(b_shape, self.param_dict["eta"]), u_b[layer])
-            
-        self.prev_global_grad_loss_W = u_W.copy()
-        self.prev_global_grad_loss_b = u_b.copy()
-
-
+    # Trains the neural network
     def __train(self, train_x, train_y, optimizer, minibatch_size):
         if not minibatch_size:
             minibatch_size = len(train_y)
-
+        # Loop through each x, y combination
         for x_i, y in zip(train_x, train_y):
             y = self.__helper_get_one_hot_encoded_y(y)
             
             a_i, h_i = self.__forward_prop(x_i)
             grad_loss_W, grad_loss_b = self.__back_prop(a_i, h_i, y)
-
+            # Sums up gradients for all x_i, y examples
             optimizer.grad_update(grad_loss_W, grad_loss_b)
-    
+            # If batch is over, updates the weights
             if optimizer.num_points_seen % minibatch_size == 0:   
                 optimizer.step_update()
 
 
+    # Helper function which fetches loss and accuracy - used during training to get loss and accuracy for train and val datasets
     def __helper_loss_accuracy(self, loss_acc_X, loss_acc_y):
         loss = list()
         for x_i, y in zip(loss_acc_X, loss_acc_y): 
@@ -158,6 +133,8 @@ class neural_network():
 
         return loss, accuracy
     
+
+    # Validation calculates the required losses to check if training is progressing
     def __validate(self, train_x, train_y, val_x, val_y):
         train_loss, train_accuracy = self.__helper_loss_accuracy(train_x, train_y)
         val_loss, val_accuracy = self.__helper_loss_accuracy(val_x, val_y)
@@ -165,6 +142,7 @@ class neural_network():
         return train_loss, train_accuracy, val_loss, val_accuracy
         
 
+    # Function called by user to model the dataset X, y
     def fit(self, wandb_tracker, optimizer, train_x, train_y, val_x=None, val_y=None
             , minibatch_size=0, epochs=1):
         for epoch in range(epochs):   
@@ -186,6 +164,7 @@ class neural_network():
         print("Model fitting is over.")
 
 
+    # Helper function to get the prediction for a single input
     def __predict_single_input(self, single_input_x):
         x_i = single_input_x.copy()
         for layer in self.layers:
@@ -195,6 +174,7 @@ class neural_network():
         return x_i
         
 
+    # Function called by user to predict a list of outputs for a list of inputs
     def predict(self, vec_x):
         y_pred = []
         for x_i in vec_x:
@@ -206,6 +186,7 @@ class neural_network():
         return np.array(y_pred)
 
 
+    # Function called by user to save weights and model metadata
     def save_model(self, file_location):
         model_json = {
             "num_neurons_dict" : self.num_neurons_dict,
@@ -221,6 +202,7 @@ class neural_network():
             outfile.write(model_object)
 
 
+    # Function called by user to load stored weights and model metadata
     def load_model(self, file_location):
         with open(file_location, 'r') as infile:   
             model_object = json.load(infile)
@@ -237,5 +219,3 @@ class neural_network():
             
             self.W = model_object.W
             self.b = model_object.b
-
-        

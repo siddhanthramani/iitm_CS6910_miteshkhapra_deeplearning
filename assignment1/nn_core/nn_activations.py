@@ -18,7 +18,7 @@ def forward_activation(a_input, activation):
         return numerically_stable_softmax(a_input)
 
     elif activation == "relu":
-        a_input[a_input < 0] = 0
+        a_input[a_input <= 0] = 0
         return a_input
 
 # Gradients wrt activation layer
@@ -35,8 +35,8 @@ def grad_activation(a_input, activation):
         return (1 - np.square(activated_val))
 
     elif activation == "relu":
-        a_input[a_input >= 0] = 1
-        a_input[a_input < 0] = 0
+        a_input[a_input > 0] = 1
+        a_input[a_input <= 0] = 0
         return a_input
 
 # Gradients wrt output activation layers
@@ -47,8 +47,8 @@ def grad_wrt_output(y, y_pred, loss_function, activation):
         else:
             print(str_error_softmax)
     elif loss_function == "mean_squared_error":
-        if activation == "softmax":
-            return (y_pred - y) * y_pred * (1 - y_pred)
+        if activation == "softmax": 
+            return 2 * (y_pred - y) * y_pred * (1 - y_pred)
         else:
             print(str_error_softmax)
 

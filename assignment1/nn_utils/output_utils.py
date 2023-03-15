@@ -39,9 +39,6 @@ def get_accuracy_metrics(y_true, y_pred, micron_on=0,
     
     return return_values
 
-def plot_validation_metrics(list_validation_loss, list_validation_accuracy):
-    pass
-
 def plot_confusion_matrix(wandb, y_true, y_pred):
     df = pd.DataFrame({"y_true" : y_true, "y_pred" : y_pred})
     a = df.groupby(["y_true", "y_pred"]).agg(count=("y_pred", "count")).reset_index()
