@@ -83,8 +83,8 @@ print(h2s)
 num_neurons_dict = {0:2, 1:4, 2:4, 2:2}
 activation_dict = {0 : "logistic", 1 : "softmax"}
 
-nn1 = neural_network(num_neurons_dict, activation_dict, nn_init=xavier_init, weight_type="w")
-# nn1 = neural_network(num_neurons_dict, activation_dict, nn_init=np.random.rand) #, weight_type="w"
+nn1 = neural_network(num_neurons_dict, activation_dict, weight_init=xavier_init, weight_type="w")
+# nn1 = neural_network(num_neurons_dict, activation_dict, weight_init=np.random.rand) #, weight_type="w"
 data["train_X"] = np.array([np.array([-255, 255]), np.array([-255, -255]) 
                             , np.array([255, -255]), np.array([255, 255])]).reshape(4, 2, 1)
 data["train_y"] = np.array([1, 1, 1, 2]).reshape(4, 1)

@@ -5,8 +5,10 @@ import wandb
 import random
 import matplotlib.pyplot as plt
 
+# Hard coding input shape 
 dimensions = (28, 28)
 
+# Loading the data for appropriate dataset
 def load(path = "../data/", dataset="fashionmnist"):
     t0 = time.time()
     print(f"Loading {dataset}")
@@ -37,10 +39,12 @@ def load(path = "../data/", dataset="fashionmnist"):
     return data
 
 
+# Plotting a single image
 def plot_image(image):
     plt.show(image)
 
 
+# Getting a random image per class
 def get_random_class_indices(label_data):
     random_sample_indices = []
     for unique_class in np.unique(label_data):
@@ -49,6 +53,7 @@ def get_random_class_indices(label_data):
     return random_sample_indices
 
 
+# Plotting a random image per class
 def plot_random_image_per_class(data, from_dataset="train"):
     label_data = data["{}_y".format(from_dataset)]
     random_sample_indices = get_random_class_indices(label_data)
@@ -69,6 +74,7 @@ def plot_random_image_per_class(data, from_dataset="train"):
     return plt
 
 
+# Checks the given data for infinite or NaN values
 def do_data_checks(X_check, y_check):
     for x, y in zip(X_check, y_check):
         y = np.array([1 if i==(y-1) else 0 for i in range(10)]).reshape(10, 1)
@@ -76,6 +82,7 @@ def do_data_checks(X_check, y_check):
             print(np.isfinite(x), np.isfinite(y))
             break
 
+# If run, logs a random image per class in  
 if __name__ == "__main__":
     wandb.init(project="sweep_test")
 

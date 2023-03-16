@@ -1,6 +1,7 @@
 # Imports required modules
 from nn_utils.data_utils import load, plot_random_image_per_class, do_data_checks
 from nn_utils.output_utils import get_accuracy_metrics
+from nn_utils import constants
 from nn_core.nn_main import neural_network
 from nn_core.nn_optimizer import *
 from nn_user.weight_init import *
@@ -9,6 +10,7 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 import json
 import wandb
+
 wandb_initializer = {
     "random" : random_init
     , "xavier" : xavier_init
@@ -39,6 +41,7 @@ def main():
     batch_size = wandb.config.batch_size
     loss = wandb.config.loss
     weight_init = wandb.config.weight_init
+    weight_init_multiplication_factor = wandb.config.weight_init_multiplication_factor
     optimizer = wandb.config.optimizer
     learning_rate = wandb.config.learning_rate
     beta = wandb.config.beta
@@ -60,7 +63,7 @@ def main():
         pass
 
     # Setting epsilon value
-    constants.epsilon = epsilon
+    global_constants = constants.global_constants(epsilon=epsilon)
 
     # Defining the network structure
     dict_neural_network_structure = {}
@@ -73,7 +76,8 @@ def main():
     activation_dict = {0 : activation_function, 1 : "softmax"}
     
     # Creating the neural network instance
-    nn1 = neural_network(dict_neural_network_structure, activation_dict, loss_function=loss, nn_init=wandb_initializer[weight_init])
+    nn1 = neural_network(global_constants, dict_neural_network_structure, activation_dict, loss_function=loss
+                         , weight_init=wandb_initializer[weight_init], weight_init_multiplication_factor=weight_init_multiplication_factor)
     
     # Defining the optimizer
     optimizer = wandb_optimizer[optimizer](nn1, eta=learning_rate, weight_decay=weight_decay, **wandb_optimizer_params[optimizer])

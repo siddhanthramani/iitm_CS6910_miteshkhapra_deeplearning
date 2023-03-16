@@ -4,13 +4,12 @@ from nn_core.nn_activations import *
 from nn_core.nn_loss import *
 from nn_core.nn_optimizer import *
 from nn_utils.output_utils import get_accuracy_metrics
-from nn_utils import constants
 
 class neural_network():
 
     # The init function contains the instance variables and methods
-    def __init__(self, num_neurons_dict, activation_dict, activation_type="constant"
-                 , loss_function="cross_entropy" , nn_init=np.random.rand, nn_init_random_max=1):
+    def __init__(self, global_constants, num_neurons_dict, activation_dict, activation_type="constant"
+                 , loss_function="cross_entropy" , weight_init=np.random.rand, weight_init_multiplication_factor=1):
         
         # setting up the neural architecture
         self.num_neurons_dict = num_neurons_dict
@@ -22,15 +21,15 @@ class neural_network():
         self.layers = list(range(1, len(num_neurons_dict.keys())))
         self.max_layer = max(self.layers)
         self.number_of_classes = self.num_neurons_dict[self.max_layer] 
-                
+        self.epsilon = global_constants.epsilon                
         # sets up the initial weights of the neural network as per user input
         self.W = dict()
         self.b = dict()
         for layer, num_neurons in sorted(num_neurons_dict.items()):
             if layer == 0:
                 continue
-            self.W[layer] = nn_init(num_neurons, num_neurons_dict[layer-1], "w") * nn_init_random_max
-            self.b[layer] = nn_init(num_neurons, 1, "b") * nn_init_random_max
+            self.W[layer] = weight_init(num_neurons, num_neurons_dict[layer-1], "w") * weight_init_multiplication_factor
+            self.b[layer] = weight_init(num_neurons, 1, "b") * weight_init_multiplication_factor
         
 
     # A helper function used to get the activation function of a particular layer
@@ -124,7 +123,7 @@ class neural_network():
         loss = list()
         for x_i, y in zip(loss_acc_X, loss_acc_y): 
             y = self.__helper_get_one_hot_encoded_y(y)
-            loss.append(get_loss(y, self.__predict_single_input(x_i), self.loss_function, constants.epsilon))
+            loss.append(get_loss(y, self.__predict_single_input(x_i), self.loss_function, self.epsilon))
         
         y_pred = self.predict(loss_acc_X)
         accuracy_metrics = get_accuracy_metrics(loss_acc_y, y_pred)

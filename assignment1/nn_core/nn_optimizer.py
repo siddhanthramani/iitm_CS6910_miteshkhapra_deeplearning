@@ -1,17 +1,17 @@
 import numpy as np
 from copy import deepcopy
-from nn_utils import constants
 import math
 
 class regular_gradient_descent:
 
+    # Inits the optimizer
     def __init__(self, neural_network_instance, eta, weight_decay=0.0):
         self.eta = eta
         self.weight_decay = weight_decay
         self.nn_instance = neural_network_instance
         self.step_reset()
 
-
+    # A gradient update - happens every time we backpass through a single data sample
     def grad_update(self, grad_loss_W, grad_loss_b):
         for layer in self.nn_instance.layers:
             self.total_grad_loss_W[layer] += grad_loss_W[layer]
@@ -19,6 +19,7 @@ class regular_gradient_descent:
         self.num_points_seen += 1        
 
 
+    # A step update - happens every time we update the gradients at the end of a minibatch
     def step_update(self):
         for layer in self.nn_instance.layers:
             W_shape = self.nn_instance.W[layer].shape
@@ -28,10 +29,10 @@ class regular_gradient_descent:
                                         - np.multiply(np.full(W_shape, self.eta * self.weight_decay), self.nn_instance.W[layer])
             self.nn_instance.b[layer] -= np.multiply(np.full(b_shape, self.eta), self.total_grad_loss_b[layer])
             
-
         self.step_reset()
 
 
+    # Resets required class variables after a step update
     def step_reset(self):
         self.num_points_seen = 0
         self.total_grad_loss_W = dict()
@@ -45,6 +46,7 @@ class regular_gradient_descent:
 
 class momentum_gradient_descent:
 
+    # Inits the optimizer
     def __init__(self, neural_network_instance, eta, beta, weight_decay=0.0):
         if (beta < 0 or beta >= 1):
             print("WARNING : Beta value is not between 0 (inclusive) and 1")
@@ -55,6 +57,7 @@ class momentum_gradient_descent:
         self.setup()
 
 
+    # Sets up required class variables before first step update
     def setup(self):
         self.num_points_seen = 0
         self.total_grad_loss_W = dict()
@@ -68,6 +71,7 @@ class momentum_gradient_descent:
             self.prev_total_grad_loss_b[layer] = np.zeros(self.nn_instance.b[layer].shape)
 
 
+    # A gradient update - happens every time we backpass through a single data sample
     def grad_update(self, grad_loss_W, grad_loss_b):
         for layer in self.nn_instance.layers:
             self.total_grad_loss_W[layer] += grad_loss_W[layer]
@@ -75,6 +79,7 @@ class momentum_gradient_descent:
         self.num_points_seen += 1
 
 
+    # A step update - happens every time we update the gradients at the end of a minibatch
     def step_update(self):
         for layer in self.nn_instance.layers:
             W_shape = self.nn_instance.W[layer].shape
@@ -92,6 +97,7 @@ class momentum_gradient_descent:
         self.step_reset()
 
 
+    # Resets required class variables after a step update
     def step_reset(self):
         self.num_points_seen = 0
         self.total_grad_loss_W = dict()
@@ -106,6 +112,7 @@ class momentum_gradient_descent:
 
 class nestrov_accelerated_gradient_descent:
 
+    # Inits the optimizer
     def __init__(self, neural_network_instance, eta, beta, weight_decay=0.0):
         if (beta < 0 or beta >= 1):
             print("WARNING : Beta value is not between 0 (inclusive) and 1")
@@ -117,6 +124,7 @@ class nestrov_accelerated_gradient_descent:
         self.setup()
 
 
+    # Sets up required class variables before first step update
     def setup(self):
         self.num_points_seen = 0
         self.total_grad_loss_W = dict()
@@ -130,6 +138,7 @@ class nestrov_accelerated_gradient_descent:
             self.prev_total_grad_loss_b[layer] = np.zeros(self.nn_instance.b[layer].shape)
 
 
+    # A gradient update - happens every time we backpass through a single data sample
     def grad_update(self, grad_loss_W, grad_loss_b):
         for layer in self.nn_instance.layers:
             self.total_grad_loss_W[layer] += grad_loss_W[layer]
@@ -137,6 +146,7 @@ class nestrov_accelerated_gradient_descent:
         self.num_points_seen += 1   
 
 
+    # A step update - happens every time we update the gradients at the end of a minibatch
     def step_update(self):
         if self.step_update_first_time:
             self.actual_W = dict()
@@ -168,6 +178,7 @@ class nestrov_accelerated_gradient_descent:
         self.step_reset()
 
             
+    # Resets required class variables after a step update
     def step_reset(self):
         self.num_points_seen = 0
         self.total_grad_loss_W = dict()
@@ -181,6 +192,7 @@ class nestrov_accelerated_gradient_descent:
 
 class RMSProp:
 
+    # Inits the optimizer
     def __init__(self, neural_network_instance, eta, beta, weight_decay=0.0):
         if (beta < 0 or beta >= 1):
             print("WARNING : Beta value is not between 0 (inclusive) and 1")
@@ -191,6 +203,7 @@ class RMSProp:
         self.setup()
 
 
+    # Sets up required class variables before first step update
     def setup(self):
         self.num_points_seen = 0
         self.total_grad_loss_W = dict()
@@ -204,6 +217,7 @@ class RMSProp:
             self.prev_total_grad_loss_b[layer] = np.zeros(self.nn_instance.b[layer].shape)
 
 
+    # A gradient update - happens every time we backpass through a single data sample
     def grad_update(self, grad_loss_W, grad_loss_b):
         for layer in self.nn_instance.layers:
             self.total_grad_loss_W[layer] += grad_loss_W[layer]
@@ -211,6 +225,7 @@ class RMSProp:
         self.num_points_seen += 1        
 
 
+    # A step update - happens every time we update the gradients at the end of a minibatch
     def step_update(self):
         for layer in self.nn_instance.layers:
             W_shape = self.nn_instance.W[layer].shape
@@ -221,14 +236,15 @@ class RMSProp:
             self.prev_total_grad_loss_b[layer] = np.add(np.multiply(np.full(b_shape, self.beta), self.prev_total_grad_loss_b[layer])
                                                         , np.multiply(np.full(b_shape, (1-self.beta)), np.square(self.total_grad_loss_b[layer])))
             
-            self.nn_instance.W[layer] -= np.multiply(self.eta, self.total_grad_loss_W[layer]) / (np.sqrt(self.prev_total_grad_loss_W[layer]) + constants.epsilon)\
+            self.nn_instance.W[layer] -= np.multiply(self.eta, self.total_grad_loss_W[layer]) / (np.sqrt(self.prev_total_grad_loss_W[layer]) + self.nn_instance.epsilon)\
                                         - np.multiply(np.full(W_shape, self.eta * self.weight_decay), self.nn_instance.W[layer])
             
-            self.nn_instance.b[layer] -= np.multiply(self.eta, self.total_grad_loss_b[layer]) / (np.sqrt(self.prev_total_grad_loss_b[layer]) + constants.epsilon)
+            self.nn_instance.b[layer] -= np.multiply(self.eta, self.total_grad_loss_b[layer]) / (np.sqrt(self.prev_total_grad_loss_b[layer]) + self.nn_instance.epsilon)
         
         self.step_reset()
 
 
+    # Resets required class variables after a step update
     def step_reset(self):
         self.num_points_seen = 0
         self.total_grad_loss_W = dict()
@@ -242,6 +258,7 @@ class RMSProp:
 
 class Adadelta:
 
+    # Inits the optimizer
     def __init__(self, neural_network_instance, eta, beta, weight_decay=0.0):
         if (beta < 0 or beta >= 1):
             print("WARNING : Beta value is not between 0 (inclusive) and 1")
@@ -252,6 +269,7 @@ class Adadelta:
         self.setup()
 
 
+    # Sets up required class variables before first step update
     def setup(self):
         self.num_points_seen = 0
         self.total_grad_loss_W = dict()
@@ -269,6 +287,7 @@ class Adadelta:
             self.total_grad_loss_ub[layer] = np.zeros(self.nn_instance.b[layer].shape)
 
 
+    # A gradient update - happens every time we backpass through a single data sample
     def grad_update(self, grad_loss_W, grad_loss_b):
         for layer in self.nn_instance.layers:
             self.total_grad_loss_W[layer] += grad_loss_W[layer]
@@ -276,6 +295,7 @@ class Adadelta:
         self.num_points_seen += 1        
 
 
+    # A step update - happens every time we update the gradients at the end of a minibatch
     def step_update(self):
         this_total_grad_loss_W = dict()
         this_total_grad_loss_b = dict()
@@ -289,8 +309,8 @@ class Adadelta:
             self.total_grad_loss_vb[layer] = np.add(np.multiply(np.full(b_shape, self.beta), self.total_grad_loss_vb[layer])
                                                         , np.multiply(np.full(b_shape, (1-self.beta)), np.square(self.total_grad_loss_b[layer])))
             
-            this_total_grad_loss_W[layer] = np.multiply(self.total_grad_loss_W[layer], np.sqrt(self.total_grad_loss_uW[layer] + constants.epsilon)) / np.sqrt(self.total_grad_loss_vW[layer] + constants.epsilon) 
-            this_total_grad_loss_b[layer] = np.multiply(self.total_grad_loss_b[layer], np.sqrt(self.total_grad_loss_ub[layer] + constants.epsilon)) / np.sqrt(self.total_grad_loss_vb[layer] + constants.epsilon)
+            this_total_grad_loss_W[layer] = np.multiply(self.total_grad_loss_W[layer], np.sqrt(self.total_grad_loss_uW[layer] + self.nn_instance.epsilon)) / np.sqrt(self.total_grad_loss_vW[layer] + self.nn_instance.epsilon) 
+            this_total_grad_loss_b[layer] = np.multiply(self.total_grad_loss_b[layer], np.sqrt(self.total_grad_loss_ub[layer] + self.nn_instance.epsilon)) / np.sqrt(self.total_grad_loss_vb[layer] + self.nn_instance.epsilon)
 
             self.total_grad_loss_uW[layer] = np.add(np.multiply(np.full(W_shape, self.beta), self.total_grad_loss_uW[layer])
                                                         , np.multiply(np.full(W_shape, (1-self.beta)), np.square(this_total_grad_loss_W[layer])))
@@ -304,6 +324,7 @@ class Adadelta:
         self.step_reset()
 
 
+    # Resets required class variables after a step update
     def step_reset(self):
         self.num_points_seen = 0
         self.total_grad_loss_W = dict()
@@ -317,6 +338,7 @@ class Adadelta:
 
 class Adam:
 
+    # Inits the optimizer
     def __init__(self, neural_network_instance, eta, beta1, beta2, weight_decay=0.0):
         if ((beta1 < 0 or beta1 >= 1) or (beta2 < 0 or beta2 >= 1)):
             print("WARNING : Beta value is not between 0 (inclusive) and 1")
@@ -329,6 +351,7 @@ class Adam:
         self.setup()
 
 
+    # Sets up required class variables before first step update
     def setup(self):
         self.num_points_seen = 0
         self.total_grad_loss_W = dict()
@@ -346,6 +369,7 @@ class Adam:
             self.total_grad_loss_vb[layer] = np.zeros(self.nn_instance.b[layer].shape)
                 
 
+    # A gradient update - happens every time we backpass through a single data sample
     def grad_update(self, grad_loss_W, grad_loss_b):
         for layer in self.nn_instance.layers:
             self.total_grad_loss_W[layer] += grad_loss_W[layer]
@@ -353,6 +377,7 @@ class Adam:
         self.num_points_seen += 1        
 
 
+    # A step update - happens every time we update the gradients at the end of a minibatch
     def step_update(self):
         this_total_grad_loss_mW_hat = dict()
         this_total_grad_loss_mb_hat = dict()
@@ -379,14 +404,15 @@ class Adam:
             this_total_grad_loss_vW_hat[layer] = self.total_grad_loss_vW[layer]/ (1 - np.power(self.beta2, self.step_update_count + 1))
             this_total_grad_loss_vb_hat[layer] = self.total_grad_loss_vb[layer]/ (1 - np.power(self.beta2, self.step_update_count + 1))
             
-            self.nn_instance.W[layer] -= (self.eta * this_total_grad_loss_mW_hat[layer])/(np.sqrt(this_total_grad_loss_vW_hat[layer]) + constants.epsilon)\
+            self.nn_instance.W[layer] -= (self.eta * this_total_grad_loss_mW_hat[layer])/(np.sqrt(this_total_grad_loss_vW_hat[layer]) + self.nn_instance.epsilon)\
                                         - np.multiply(np.full(W_shape, self.eta * self.weight_decay), self.nn_instance.W[layer])
-            self.nn_instance.b[layer] -= (self.eta * this_total_grad_loss_mb_hat[layer])/(np.sqrt(this_total_grad_loss_vb_hat[layer]) + constants.epsilon)
+            self.nn_instance.b[layer] -= (self.eta * this_total_grad_loss_mb_hat[layer])/(np.sqrt(this_total_grad_loss_vb_hat[layer]) + self.nn_instance.epsilon)
         
         self.step_update_count += 1
         self.step_reset()
 
 
+    # Resets required class variables after a step update
     def step_reset(self):
         self.num_points_seen = 0
         self.total_grad_loss_W = dict()
@@ -400,6 +426,7 @@ class Adam:
 
 class NAdam:
 
+    # Inits the optimizer
     def __init__(self, neural_network_instance, eta, beta1, beta2, weight_decay=0.0):
         if ((beta1 < 0 or beta1 >= 1) or (beta2 < 0 or beta2 >= 1)):
             print("WARNING : Beta value is not between 0 (inclusive) and 1")
@@ -412,6 +439,7 @@ class NAdam:
         self.setup()
 
 
+    # Sets up required class variables before first step update
     def setup(self):
         self.num_points_seen = 0
         self.total_grad_loss_W = dict()
@@ -429,6 +457,7 @@ class NAdam:
             self.total_grad_loss_vb[layer] = np.zeros(self.nn_instance.b[layer].shape)
 
 
+    # A gradient update - happens every time we backpass through a single data sample
     def grad_update(self, grad_loss_W, grad_loss_b):
         for layer in self.nn_instance.layers:
             self.total_grad_loss_W[layer] += grad_loss_W[layer]
@@ -436,6 +465,7 @@ class NAdam:
         self.num_points_seen += 1        
 
 
+    # A step update - happens every time we update the gradients at the end of a minibatch
     def step_update(self):
         this_total_grad_loss_mW_hat = dict()
         this_total_grad_loss_mb_hat = dict()
@@ -462,12 +492,12 @@ class NAdam:
             this_total_grad_loss_vW_hat[layer] = self.total_grad_loss_vW[layer]/ (1 - np.power(self.beta2, self.step_update_count + 1))
             this_total_grad_loss_vb_hat[layer] = self.total_grad_loss_vb[layer]/ (1 - np.power(self.beta2, self.step_update_count + 1))
             
-            self.nn_instance.W[layer] -= ((self.eta/np.sqrt(this_total_grad_loss_vW_hat[layer] + constants.epsilon)) *
+            self.nn_instance.W[layer] -= ((self.eta/np.sqrt(this_total_grad_loss_vW_hat[layer] + self.nn_instance.epsilon)) *
                                           (np.add(self.beta1 * this_total_grad_loss_mW_hat[layer], 
                                             ((1-self.beta1) * self.total_grad_loss_W[layer]) / (1 - np.power(self.beta1, self.step_update_count + 1))
                                             )))\
                                         - np.multiply(np.full(W_shape, self.eta * self.weight_decay), self.nn_instance.W[layer])
-            self.nn_instance.b[layer] -= ((self.eta/np.sqrt(this_total_grad_loss_vb_hat[layer] + constants.epsilon)) *
+            self.nn_instance.b[layer] -= ((self.eta/np.sqrt(this_total_grad_loss_vb_hat[layer] + self.nn_instance.epsilon)) *
                                           (np.add(self.beta1 * this_total_grad_loss_mb_hat[layer], 
                                             ((1-self.beta1) * self.total_grad_loss_b[layer]) / (1 - np.power(self.beta1, self.step_update_count + 1)))))
         
@@ -475,6 +505,7 @@ class NAdam:
         self.step_reset()
 
 
+    # Resets required class variables after a step update
     def step_reset(self):
         self.num_points_seen = 0
         self.total_grad_loss_W = dict()

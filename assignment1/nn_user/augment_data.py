@@ -5,12 +5,18 @@ import random
 from tqdm import tqdm
 import albumentations as A
 
+# Hard codes the shape of input
 x_shape = (1, 784, 1)
+
+# Albumentations allows you to do some great transforms quite easily
+# Edit this to change your transformations
+# Visualize the transform here - https://demo.albumentations.ai/
 transform = A.Compose([
     A.HorizontalFlip(p=0.5),
     A.RandomBrightnessContrast(p=0.2),
 ])
 
+# Augment data
 def augment_data(X, y, mode="replace", albumentation_transformer=transform):
     first_index = 1
     for img, true_value in tqdm(zip(X, y)):

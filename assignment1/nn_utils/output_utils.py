@@ -3,6 +3,7 @@ from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_sc
 import pandas as pd
 import matplotlib.pyplot as plt
 
+# Fetches accuracy and other classification metrics given y_true and y_pred
 def get_accuracy_metrics(y_true, y_pred, micron_on=0,
                         macro_on=0, weighted_on=0, confusion_on=0):
     return_values = []

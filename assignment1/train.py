@@ -32,6 +32,7 @@ wandb_optimizer_params = {
     , "nadam" : {}
 }
 
+# Parser for command line arguments
 def cli_parser():
     parser = ArgumentParser(prog="train"
                             , description="Train and test a neural network. Track it via wandb."
@@ -43,7 +44,7 @@ def cli_parser():
     nn_arch_parser = parser.add_argument_group("Neural Network Architecture Group"
                                             , "Options related to defining the network structure.")
 
-
+    # Parser for WandB related arguments
     wandb_parser.add_argument("-wp", "--wandb_project", type=str, default="test_experiment"
                         , help="Project name used to track experiments in Weights & Biases dashboard."
                         , metavar="project_name")
@@ -51,6 +52,7 @@ def cli_parser():
                         , help="Wandb Entity used to track experiments in the Weights & Biases dashboard."
                         , metavar="entity_name")
 
+    # Parser for general arguments
     general_params_parser.add_argument("-d", "--dataset", type=str, default="fashion_mnist", choices=["mnist", "fashion_mnist"]
                         , help="Choose the dataset you would like to model."
                         , metavar="dataset")
@@ -66,7 +68,14 @@ def cli_parser():
     general_params_parser.add_argument("-w_i", "--weight_init", type=str, default="xavier", choices=["random", "xavier"]
                         , help="Weight and bias initialization method."
                         , metavar="weight_init")
-
+    general_params_parser.add_argument("-wimf", "--weight_init_multiplication_factor", type=int, default=1
+                        , help="Multiply the weight initialzation with this factor to scale init values"
+                        , metavar="weight_init_multiplication_factor")
+    general_params_parser.add_argument("-ado", "--augment_data_on", type=int, default=0, choices=[0, 1]
+                        , help="Does data need to be augmented? 0-No, 1-Yes"
+                        , metavar="augment_data_on")
+    
+    # Parser for optimizer related arguments
     optimizer_parser.add_argument("-o", "--optimizer", type=str, default="adam", choices=["regular_gradient_descent", "momentum_gradient_descent", "nestrov_accelerated_gradient_descent", "rmsprop", "adam", "nadam"]
                         , help="Optimization algorithm"
                         , metavar="optimzer")
@@ -89,6 +98,7 @@ def cli_parser():
                         , help="Weight decay used by optimizers."
                         , metavar="weight_decay")
 
+    # Parser for neural network architecture related arguments
     nn_arch_parser.add_argument("-nhl", "--number_of_hidden_layers", type=int, default=1
                         , help="Number of hidden layers used in feedforward neural network."
                         , metavar="number_of_hidden_layers")
@@ -119,6 +129,8 @@ if __name__ == "__main__":
     batch_size = args["batch_size"]
     loss = args["loss"]
     weight_init = args["weight_init"]
+    weight_init_multiplication_factor = args["weight_init_multiplication_factor"]
+    augment_data_on = args["augment_data_on"]
     optimizer = args["optimizer"]
     learning_rate = args["learning_rate"]
     beta = args["beta"]
@@ -140,7 +152,7 @@ if __name__ == "__main__":
         pass
 
     # Setting epsilon value
-    constants.epsilon = epsilon
+    global_constants = constants.global_constants(epsilon=epsilon)
 
     # Loading the data
     data = load(dataset)
@@ -155,8 +167,9 @@ if __name__ == "__main__":
     do_data_checks(X_val, y_val)
     do_data_checks(X_test, y_test)
 
-    # Augment data - if required
-    # X_train, y_train = augment_data(X_train, y_train, mode="replace")
+    # Augment data
+    if augment_data_on:
+        X_train, y_train = augment_data(X_train, y_train, mode="append")
 
     # Start wandb
     if wandb_entity == "None":
@@ -175,7 +188,8 @@ if __name__ == "__main__":
     activation_dict = {0 : activation, 1 : "softmax"}
     
     # Creating the neural network instance
-    nn1 = neural_network(dict_neural_network_structure, activation_dict, loss_function=loss, nn_init=wandb_initializer[weight_init])
+    nn1 = neural_network(global_constants, dict_neural_network_structure, activation_dict, loss_function=loss
+                         , weight_init=wandb_initializer[weight_init], weight_init_multiplication_factor=weight_init_multiplication_factor)
     
     # Defining the optimizer
     optimizer = wandb_optimizer[optimizer](nn1, eta=learning_rate, weight_decay=weight_decay, **wandb_optimizer_params[optimizer])
@@ -189,5 +203,9 @@ if __name__ == "__main__":
     for val in accuracy_metrics:
         print(val*100)
         wandb.log({"test_accuracy" : val*100})
+    
+    # Plotting the confusion matrix and logging it on wandb
     plot_confusion_matrix(wandb, y_test, output)
+
+    # Finishing the wandb experiment
     wandb.finish()

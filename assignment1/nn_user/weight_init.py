@@ -1,9 +1,13 @@
 import numpy as np
 
+# Weight inits should take three params - shape0, shape1, worb (weights or biases)
+
+# Random weight initialization
 def random_init(shape0, shape_1, worb):
     weights = np.random.rand(shape0, shape_1)
     return weights
 
+# Xavier weight initialization
 def xavier_init(shape_0, shape_1, worb):
     if worb == "w":
         nodes_in = shape_0 * shape_1
