@@ -80,7 +80,7 @@ print("h2s")
 print(h2s)
 
 
-num_neurons_dict = {0:2, 1:4, 2:4, 2:2}
+num_neurons_dict = {0:2, 1:4, 2:4, 3:2}
 activation_dict = {0 : "logistic", 1 : "softmax"}
 
 nn1 = neural_network(num_neurons_dict, activation_dict, weight_init=xavier_init, weight_type="w")

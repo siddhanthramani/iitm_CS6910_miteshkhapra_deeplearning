@@ -8,7 +8,7 @@ _wandb:
     is_jupyter_run: false
     is_kaggle_kernel: false
     python_version: 3.7.9
-    start_time: 1679159556.531203
+    start_time: 1679161169.599561
     t:
       1:
       - 5
@@ -52,19 +52,19 @@ epsilon:
   value: 1.0e-08
 learning_rate:
   desc: null
-  value: 0.01
+  value: 1.0e-05
 loss:
   desc: null
   value: cross_entropy
 number_of_hidden_layers:
   desc: null
-  value: 5
+  value: 3
 optimizer:
   desc: null
-  value: adam
+  value: momentum_gradient_descent
 size_of_every_hidden_layer:
   desc: null
-  value: 64
+  value: 16
 weight_decay:
   desc: null
   value: 0

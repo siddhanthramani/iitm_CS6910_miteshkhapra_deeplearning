@@ -61,12 +61,34 @@ python assignment1/train.py --help
 
 <br>
 
-## Useful tips for users
+## User editable code
 Most libraries out there do not allow you to include your own algorithms and they default many hyperparameters. But there are three things which I believe can have drastic changes in the accuracy, and that you should have the power to influence these things - consciously.<br>
 Thus my code allows you to influence and define the following three things:
 1. The neural network structure - quite obvious. You define the structure.
-2. The data itself - maybe obvious. You can define the transformations which you will like to include in the data to make the model more robust. Albumentations implementation has been added for reference.
+    The neural network structure definition was designed to be highly easy and visual to understand.
+    To define the structure you have to pass in two dictionaries
+    - A dict with key:value pairs where the key identifies the layer and the value defines the number of neurons to be present in that layer. The smallest key should be 0 and whose value should be the number of inputs, and the largest key will be the equal to the total number of layers in the network with the value being the size of the output.
+    For example, for a neural network which has 2 inputs, a single hidden layer with 4 neurons and 5 outputs, the dict will be :<br>
+    {0:2, 1:4, 2:5}
+    - A dict which defines the activation for each layer. This is of two types:
+        1. When the activation functions are constant for all layers except the last layer, the dict will contain two key:value pairs. 
+        Key 1 will contain the activation function of the output layer, and Key 0 will contain the activation function of all other layers.
+        2. When the activation function varies from layer to layer, the dict will contain multiple key:value pairs where keys will identify the layer and the values will contain the activation function for that particular layer. The key set will contain values from 1 to the number_of_layers in the network. 
+2. The data itself - maybe obvious. You can define the transformations which you will like to include in the data to make the model more robust. An albumentations implementation has been added for reference.
 3. The weight initialization method - not so obvious. You can include your own custom algorithm based on the dataset you are dealing with. Xavier implementation has been added for reference.
 
+You can write the codes to define the data transformation and the weight initialization in the nn_core folder.
+#### **Structure and functionality of nn_users**
+<img src="../assignment1/documentation/nnuser.png" width="500">
+
+How does the nn_users code work:
+
+- augment_data = Add a new data transformation to the list parameter of the A.compose function. You can have a look at how a particular transformation will affect your data [here](https://demo.albumentations.ai/).
+- weight_init = Add a new weight initialization function which takes in three inputs - Shape of axis 0 of input, Shape of axis 1 of input and worb which can either be "w" for weights init and "b" for bias init.
+
 <br>
-I will urge you to experiment with activations, optimization algorithms and loss functions also.
+
+**I will urge you to experiment with activations, optimization algorithms and loss functions also.**
+
+<br>
+

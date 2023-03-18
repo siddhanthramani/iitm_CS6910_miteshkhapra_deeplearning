@@ -118,6 +118,24 @@ pipenv install
 
 <br>
 
+## Useful tips for both users and developers 
+a. If the model is not getting trained :
+1. try experimenting with the initialization
+2. try experimenting with the learning rate
+3. try running the code for more epochs
+4. use the test.py to debug the code
+
+b. If you are receiving NaNs :
+1. Ensure the input or output data has no NaNs
+2. experiment with the factor of your initial weights - if they become too small or too large they might cause issues
+3. search the internet for numerically stable functions - especially for activations
+
+c. If loss/accuracy is not improving : 
+1. Check if the loss function and accuracy are written correctly - check with numbers if possible
+2. Use regularisation if test accuracy is poor when compared to train - try image augmentation, l2, dropout
+
+<br>
+
 ## **References :** 
 1. [CS6910](http://www.cse.iitm.ac.in/~miteshk/CS6910.html) - the lecture notes were a constant reference and has influenced a majority of my code.
 2. [Previous student's work - ArupDas15](https://github.com/ArupDas15/Fundamentals_Of_Deep_Learning/blob/master/cs6910_assignment1/optimiser.py) - This repository helped me understand that optimizers can be defined as a seperate class. I improved on this by removing redundancies. For example, the optimizer class written requested for the layer information of neural network while the neural network class also did. I made it cleaner by passing the neural network instance to the optimizer and the optimizer instance to the fit method of the neural network. This interdependency removed redundancies. Also my naming conventions are smaller and enhances readablility.
@@ -131,3 +149,4 @@ pipenv install
 10. [Representing a folder structure](https://stackoverflow.com/a/47795759) - Taught me how to create folder structures on github.
 11. [Argparse guide](https://realpython.com/command-line-interfaces-python-argparse/#creating-command-line-interfaces-with-pythons-argparse) - Fantastic guide which taught me how to use argparse module and also how to make it easier to read flags from a text file.
 12. [WandB sweeps](https://docs.wandb.ai/guides/sweeps/add-w-and-b-to-your-code) - Learned how to run a sweep.
+13. [Albumentations data transform](https://albumentations.ai/docs/getting_started/image_augmentation/) - Learned how to transform data using the albumentations library.
