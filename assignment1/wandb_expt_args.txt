@@ -1,6 +1,6 @@
 --wandb_project=test_exp
 --wandb_entity=None
---dataset=fashion_mnist
+--dataset=fashionmnist
 --epochs=20
 --batch_size=64
 --loss=cross_entropy
@@ -14,6 +14,6 @@
 --beta2=0.99
 --epsilon=1e-8
 --weight_decay=0
---num_layers=4
---hidden_size=32
+--number_of_hidden_layers=4
+--size_of_every_hidden_layer=32
 --activation=tanh

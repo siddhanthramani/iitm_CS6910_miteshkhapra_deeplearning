@@ -35,7 +35,7 @@ wandb_optimizer_params = {
 # Parser for command line arguments
 def cli_parser():
     parser = ArgumentParser(prog="train"
-                            , description="Train and test a neural network. Track it via wandb."
+                            , description="Train and test a neural network. Track it via wandb. Use python assignment1\\train.py @wandb_expt_args.text to read flags from text file."
                             , fromfile_prefix_chars="@")
 
     wandb_parser = parser.add_argument_group("Wandb Group", "Options related to wandb.")
@@ -53,7 +53,7 @@ def cli_parser():
                         , metavar="entity_name")
 
     # Parser for general arguments
-    general_params_parser.add_argument("-d", "--dataset", type=str, default="fashion_mnist", choices=["mnist", "fashion_mnist"]
+    general_params_parser.add_argument("-d", "--dataset", type=str, default="fashionmnist", choices=["mnist", "fashionmnist"]
                         , help="Choose the dataset you would like to model."
                         , metavar="dataset")
     general_params_parser.add_argument("-e", "--epochs", type=int, default=1
@@ -109,12 +109,7 @@ def cli_parser():
                         , help="Activation function of each layer."
                         , metavar="activation_function")
 
-    args_path = "./assignment1/wandb_expt_args.txt"
-    if os.path.isfile(args_path):
-        args = vars(parser.parse_args(['@{}'.format(args_path)]))
-    else:
-        args = vars(parser.parse_args())
-
+    args = vars(parser.parse_args())
     print(args)
     return args
 
@@ -155,7 +150,7 @@ if __name__ == "__main__":
     global_constants = constants.global_constants(epsilon=epsilon)
 
     # Loading the data
-    data = load(dataset)
+    data = load(dataset=dataset)
     X = data["train_X"]/255
     y = data["train_y"]
     X_train, X_val, y_train, y_val = train_test_split(X, y, random_state=0)

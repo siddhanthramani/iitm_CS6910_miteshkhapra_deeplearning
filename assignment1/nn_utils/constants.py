@@ -3,4 +3,4 @@
 
 class global_constants():
     def __init__(self, epsilon = 1e-8):
-        epsilon = 1e-8
+        self.epsilon = 1e-8
