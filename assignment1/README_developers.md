@@ -2,6 +2,14 @@
 Ease of understanding, modularity, and ease of expanding code where three important guiding principles when I wrote the code.
 As modularity is common to all three, let us understand how the neural network code is structured.
 
+<br>
+This is the main structure and usage of the code:
+<br>
+<img src="../assignment1/documentation/main.png" width="1020">
+
+<br>
+This is the structure and use of the nn_core:
+
 
 ## Useful tips for programmers 
 a. if the model is not getting trained,
