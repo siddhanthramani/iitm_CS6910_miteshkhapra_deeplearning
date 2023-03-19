@@ -110,6 +110,7 @@ pipenv install
 <br>
 
 ## **User or developer?**
+**Note : Both these files have commands which work on Windows CMD. Adapt them suitably to use them on Linux - ensure to replace \ with / in file paths if on Linux or Windows powershell.**
 - Are you looking to use and experiment with this package?<br>
     [Read the README for users](./README_users.md)
 
