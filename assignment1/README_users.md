@@ -25,7 +25,8 @@ pipenv shell
 ### To run a batch of experiments
 1. Setting the configuration - i.e choosing the different sets of hyperparameters you wish to run your model on, you use the wandb_sweep_config.json.<br>
 Here, for each hyperparameter, include the list of hyperparameter values you'd like to try out.<br>
-You can also choose between two methods - "random" for a random search across hyperparemeters, and "grid" to search each possible hyperparemeter combination in an orderly manner.<br>
+You can also choose between three methods - "random" for a random search across hyperparemeters, and "grid" to search each possible hyperparemeter combination in an orderly manner, and "bayes" to search for hyperparameters which would optimize for the metric.
+Know more about this [here](https://docs.wandb.ai/guides/sweeps)<br>
 
 2. Run the main.py with
 ```

@@ -45,7 +45,7 @@ def cli_parser():
                                             , "Options related to defining the network structure.")
 
     # Parser for WandB related arguments
-    wandb_parser.add_argument("-wp", "--wandb_project", type=str, default="test_experiment"
+    wandb_parser.add_argument("-wp", "--wandb_project", type=str, default="Assignment1_test"
                         , help="Project name used to track experiments in Weights & Biases dashboard."
                         , metavar="project_name")
     wandb_parser.add_argument("-we", "--wandb_entity", type=str, default="None"
@@ -56,13 +56,13 @@ def cli_parser():
     general_params_parser.add_argument("-d", "--dataset", type=str, default="fashionmnist", choices=["mnist", "fashionmnist"]
                         , help="Choose the dataset you would like to model."
                         , metavar="dataset")
-    general_params_parser.add_argument("-e", "--epochs", type=int, default=1
+    general_params_parser.add_argument("-e", "--epochs", type=int, default=100
                         , help="Number of epochs to train neural network."
                         , metavar="number_of_epochs")
     general_params_parser.add_argument("-b", "--batch_size", type=int, default=64
                         , help="Batch size used to train neural network."
                         , metavar="batch_size")
-    general_params_parser.add_argument("-l", "--loss", type=str, default="mean_squared_error", choices=["mean_squared_error", "cross_entropy"]
+    general_params_parser.add_argument("-l", "--loss", type=str, default="cross_entropy", choices=["mean_squared_error", "cross_entropy"]
                         , help="Loss function to optimize the model on."
                         , metavar="loss_function")
     general_params_parser.add_argument("-w_i", "--weight_init", type=str, default="xavier", choices=["random", "xavier"]
@@ -76,10 +76,10 @@ def cli_parser():
                         , metavar="augment_data_on")
     
     # Parser for optimizer related arguments
-    optimizer_parser.add_argument("-o", "--optimizer", type=str, default="adam", choices=["regular_gradient_descent", "momentum_gradient_descent", "nestrov_accelerated_gradient_descent", "rmsprop", "adam", "nadam"]
+    optimizer_parser.add_argument("-o", "--optimizer", type=str, default="momentum_gradient_descent", choices=["regular_gradient_descent", "momentum_gradient_descent", "nestrov_accelerated_gradient_descent", "rmsprop", "adam", "nadam"]
                         , help="Optimization algorithm"
                         , metavar="optimzer")
-    optimizer_parser.add_argument("-lr", "--learning_rate", type=float, default=1e-5
+    optimizer_parser.add_argument("-lr", "--learning_rate", type=float, default=1e-4
                         , help="Learning rate used to optimize model parameters."
                         , metavar="learning_rate")
     optimizer_parser.add_argument("-beta", "--beta", type=float, default=0.9
@@ -94,7 +94,7 @@ def cli_parser():
     optimizer_parser.add_argument("-eps", "--epsilon", type=float, default=1e-8
                         , help="Epsilon used by optimizers."
                         , metavar="epsilon")
-    optimizer_parser.add_argument("-w_d", "--weight_decay", type=float, default=0.05
+    optimizer_parser.add_argument("-w_d", "--weight_decay", type=float, default=0.0001
                         , help="Weight decay used by optimizers."
                         , metavar="weight_decay")
 
@@ -102,10 +102,10 @@ def cli_parser():
     nn_arch_parser.add_argument("-nhl", "--number_of_hidden_layers", type=int, default=1
                         , help="Number of hidden layers used in feedforward neural network."
                         , metavar="number_of_hidden_layers")
-    nn_arch_parser.add_argument("-sz", "--size_of_every_hidden_layer", type=int, default=10
+    nn_arch_parser.add_argument("-sz", "--size_of_every_hidden_layer", type=int, default=64
                         , help="Number of hidden neurons in a feedforward layer."
                         , metavar="size_of_every_hidden_layer")
-    nn_arch_parser.add_argument("-a", "--activation", type=str, default="logistic", choices=["identity", "logistic", "tanh", "relu"]
+    nn_arch_parser.add_argument("-a", "--activation", type=str, default="tanh", choices=["identity", "logistic", "tanh", "relu"]
                         , help="Activation function of each layer."
                         , metavar="activation_function")
 
