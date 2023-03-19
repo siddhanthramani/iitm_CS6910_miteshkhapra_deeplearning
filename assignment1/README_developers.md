@@ -30,7 +30,7 @@ How does the nn_core code work:
 
 How does the nn_utils code work:
 - constants = Add a new constant by updating the __init__function.
-- data_utils = This defines how the data is loaded and will not require any change for the MNIST and FashionMNIST datasets. If required, each function's task is defined as a comment - understand and append.
+- data_utils = This defines how the data is loaded and will not require any change for the MNIST and FashionMNIST datasets. If required, each function's task is defined as a comment - understand and append. If you would like to log a random image subset, run the python file.
 - math_utils = Add any specially defined mathematical utility functions here.
 - output_utils = Add any functions which work on outputs - accuracy, confusion matrix, etc.
 
@@ -69,3 +69,5 @@ For example, in our code neural network structure is defined as a simple diction
 9. Regular commits with easy to understand commit messages is a must. While regular commits were made and reasonably easy to read commit messages are present, a better standard could be followed.
 
 10. Since development is in Python, the code should be implemented in the Pythonic Standard following Python best practices. For example, the naming conventions should have underscores (No camelcase).
+
+11. To implement python standards, pycodestyle can be used - Yet to be done.

@@ -12,24 +12,24 @@ import json
 import wandb
 
 wandb_initializer = {
-    "random" : random_init
-    , "xavier" : xavier_init
+    "random": random_init
+    , "xavier": xavier_init
 }
 wandb_optimizer = {
-    "regular_gradient_descent" : regular_gradient_descent
-    , "momentum_gradient_descent" : momentum_gradient_descent
-    , "nestrov_accelerated_gradient_descent" : nestrov_accelerated_gradient_descent
-    , "rmsprop" : RMSProp
-    , "adam" : Adam
-    , "nadam" : NAdam
+    "regular_gradient_descent": regular_gradient_descent
+    , "momentum_gradient_descent": momentum_gradient_descent
+    , "nestrov_accelerated_gradient_descent": nestrov_accelerated_gradient_descent
+    , "rmsprop": RMSProp
+    , "adam": Adam
+    , "nadam": NAdam
 }
 wandb_optimizer_params = {
-    "regular_gradient_descent" : {}
-    , "momentum_gradient_descent" : {}
-    , "nestrov_accelerated_gradient_descent" : {}
-    , "rmsprop" : {}
-    , "adam" : {}
-    , "nadam" : {}
+    "regular_gradient_descent": {}
+    , "momentum_gradient_descent": {}
+    , "nestrov_accelerated_gradient_descent": {}
+    , "rmsprop": {}
+    , "adam": {}
+    , "nadam": {}
 }
 
 def main():

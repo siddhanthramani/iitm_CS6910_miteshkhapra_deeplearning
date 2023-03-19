@@ -47,14 +47,14 @@ def plot_image(image):
 # Getting a random image per class
 def get_random_class_indices(label_data):
     random_sample_indices = []
-    for unique_class in np.unique(label_data):
+    for unique_class in np.sort(np.unique(label_data)):
         random_sample = random.choice(np.argwhere(label_data==unique_class))
         random_sample_indices.append(random_sample)
     return random_sample_indices
 
 
 # Plotting a random image per class
-def plot_random_image_per_class(data, from_dataset="train"):
+def plot_random_image_per_class(data, class_labels, from_dataset="train"):
     label_data = data["{}_y".format(from_dataset)]
     random_sample_indices = get_random_class_indices(label_data)
     max_columns = 5
@@ -62,12 +62,15 @@ def plot_random_image_per_class(data, from_dataset="train"):
     col_index = 0
     fig, ax = plt.subplots(nrows=int(len(random_sample_indices)/max_columns), ncols=max_columns)
     print(len(random_sample_indices))
-    for random_sample in random_sample_indices:
+    for index, random_sample in enumerate(random_sample_indices):
         if not col_index < max_columns:
             row_index +=1
             col_index = 0
         print(row_index, col_index)
         ax[row_index, col_index].imshow(data["{}_X".format(from_dataset)][random_sample].reshape(dimensions))
+        ax[row_index, col_index].axis("off")
+        ax[row_index, col_index].set_title(class_labels[index], {"fontsize" : 10})
+
         col_index += 1
         
             
@@ -84,11 +87,23 @@ def do_data_checks(X_check, y_check):
 
 # If run, logs a random image per class in  
 if __name__ == "__main__":
-    wandb.init(project="sweep_test")
-
+    class_labels = { 0 : "Top"
+                    , 1 : "Trouser"
+                    , 2 : "Pullover"
+                    , 3 : "Dress"
+                    , 4 : "Coat"
+                    , 5 : "Sandal"
+                    , 6 : "Shirt"
+                    , 7 : "Sneaker"
+                    , 8 : "Bag"
+                    , 9 : "Boot"
+    }
+    
+    wandb.init(project="Assignment1")
     # WandB plot sample image
     data = load()
-    plt = plot_random_image_per_class(data)
+    plt = plot_random_image_per_class(data, class_labels)
+    plt.savefig("../../img.jpg")
     wandb.log({"img": [wandb.Image(plt)]})
 
     wandb.finish()
