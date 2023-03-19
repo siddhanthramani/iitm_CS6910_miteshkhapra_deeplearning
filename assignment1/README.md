@@ -150,3 +150,6 @@ c. If loss/accuracy is not improving :
 11. [Argparse guide](https://realpython.com/command-line-interfaces-python-argparse/#creating-command-line-interfaces-with-pythons-argparse) - Fantastic guide which taught me how to use argparse module and also how to make it easier to read flags from a text file.
 12. [WandB sweeps](https://docs.wandb.ai/guides/sweeps/add-w-and-b-to-your-code) - Learned how to run a sweep.
 13. [Albumentations data transform](https://albumentations.ai/docs/getting_started/image_augmentation/) - Learned how to transform data using the albumentations library.
+14. [Gradient of mse loss wrt to softmax](https://stats.stackexchange.com/questions/153285/derivative-of-softmax-and-squared-error)
+15. [Gradient of softmax wrt to input](https://www.mldawn.com/the-derivative-of-softmaxz-function-w-r-t-z/)<br>
+Used 14 and 15 together to derive the gradient of mse loss wrt to the input last layer a(L).

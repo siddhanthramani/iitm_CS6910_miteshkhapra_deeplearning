@@ -34,63 +34,69 @@ wandb_optimizer_params = {
 
 def main():
     # Start wandb
-    wandb.init()
+    with wandb.init() as run:
 
-    # Initialize wandb params
-    epochs = wandb.config.epochs
-    batch_size = wandb.config.batch_size
-    loss = wandb.config.loss
-    weight_init = wandb.config.weight_init
-    weight_init_multiplication_factor = wandb.config.weight_init_multiplication_factor
-    optimizer = wandb.config.optimizer
-    learning_rate = wandb.config.learning_rate
-    beta = wandb.config.beta
-    beta1 = wandb.config.beta1
-    beta2 = wandb.config.beta2
-    epsilon = wandb.config.epsilon
-    weight_decay = wandb.config.weight_decay
-    number_of_hidden_layers = wandb.config.number_of_hidden_layers
-    size_of_every_hidden_layer = wandb.config.size_of_every_hidden_layer    
-    activation_function = wandb.config.activation_function
+        # Initialize wandb params
+        epochs = wandb.config.epochs
+        batch_size = wandb.config.batch_size
+        loss = wandb.config.loss
+        weight_init = wandb.config.weight_init
+        weight_init_multiplication_factor = wandb.config.weight_init_multiplication_factor
+        optimizer = wandb.config.optimizer
+        learning_rate = wandb.config.learning_rate
+        beta = wandb.config.beta
+        beta1 = wandb.config.beta1
+        beta2 = wandb.config.beta2
+        epsilon = wandb.config.epsilon
+        weight_decay = wandb.config.weight_decay
+        number_of_hidden_layers = wandb.config.number_of_hidden_layers
+        size_of_every_hidden_layer = wandb.config.size_of_every_hidden_layer    
+        activation_function = wandb.config.activation_function
 
-    # Setting optimizer hyperparameters as required
-    if optimizer in ["adam", "nadam"]:
-        wandb_optimizer_params[optimizer]["beta1"] = beta1
-        wandb_optimizer_params[optimizer]["beta2"] = beta2
-    elif optimizer in ["momentum_gradient_descent", "nestrov_accelerated_gradient_descent", "rmsprop"]:
-        wandb_optimizer_params[optimizer]["beta"] = beta
-    elif optimizer in ["regular_gradient_descent"]:
-        pass
+        # Setting optimizer hyperparameters as required
+        if optimizer in ["adam", "nadam"]:
+            wandb_optimizer_params[optimizer]["beta1"] = beta1
+            wandb_optimizer_params[optimizer]["beta2"] = beta2
+        elif optimizer in ["momentum_gradient_descent", "nestrov_accelerated_gradient_descent", "rmsprop"]:
+            wandb_optimizer_params[optimizer]["beta"] = beta
+        elif optimizer in ["regular_gradient_descent"]:
+            pass
 
-    # Setting epsilon value
-    global_constants = constants.global_constants(epsilon=epsilon)
+        # Setting epsilon value
+        global_constants = constants.global_constants(epsilon=epsilon)
 
-    # Defining the network structure
-    dict_neural_network_structure = {}
-    dict_neural_network_structure[0] = 28*28
-    dict_neural_network_structure[number_of_hidden_layers + 1] = 10
-    for hidden_layer in range(1, number_of_hidden_layers + 1):
-        dict_neural_network_structure[hidden_layer] = size_of_every_hidden_layer
-    
-    # Defining the activations
-    activation_dict = {0 : activation_function, 1 : "softmax"}
-    
-    # Creating the neural network instance
-    nn1 = neural_network(global_constants, dict_neural_network_structure, activation_dict, loss_function=loss
-                         , weight_init=wandb_initializer[weight_init], weight_init_multiplication_factor=weight_init_multiplication_factor)
-    
-    # Defining the optimizer
-    optimizer = wandb_optimizer[optimizer](nn1, eta=learning_rate, weight_decay=weight_decay, **wandb_optimizer_params[optimizer])
-    
-    # Fitting the model
-    nn1.fit(wandb, optimizer, X_train, y_train, X_val, y_val, epochs=epochs, minibatch_size=batch_size)
-    
-    # Checking for accuracy
-    output = nn1.predict(X_test)
-    accuracy_metrics = get_accuracy_metrics(y_test, output)
-    for val in accuracy_metrics:
-        print(val*100)
-        wandb.log({"test_accuracy" : val*100})
+        # Definng the name of the run
+        run_name = "b{}_o{}_lr{}_wd{}_nh{}_sh{}_af{}".format(batch_size, optimizer, learning_rate
+                                                 , weight_decay, number_of_hidden_layers, size_of_every_hidden_layer
+                                                 , activation_function)
+        run.name = run_name
+        # Defining the network structure
+        dict_neural_network_structure = {}
+        dict_neural_network_structure[0] = 28*28
+        dict_neural_network_structure[number_of_hidden_layers + 1] = 10
+        for hidden_layer in range(1, number_of_hidden_layers + 1):
+            dict_neural_network_structure[hidden_layer] = size_of_every_hidden_layer
+        
+        # Defining the activations
+        activation_dict = {0 : activation_function, 1 : "softmax"}
+        
+        # Creating the neural network instance
+        nn1 = neural_network(global_constants, dict_neural_network_structure, activation_dict, loss_function=loss
+                            , weight_init=wandb_initializer[weight_init], weight_init_multiplication_factor=weight_init_multiplication_factor)
+        
+        # Defining the optimizer
+        optimizer = wandb_optimizer[optimizer](nn1, eta=learning_rate, weight_decay=weight_decay, **wandb_optimizer_params[optimizer])
+        
+        # Fitting the model
+        nn1.fit(wandb, optimizer, X_train, y_train, X_val, y_val, epochs=epochs, minibatch_size=batch_size)
+        
+        # Checking for accuracy
+        output = nn1.predict(X_test)
+        accuracy_metrics = get_accuracy_metrics(y_test, output)
+        for val in accuracy_metrics:
+            print(val*100)
+            wandb.log({"test_accuracy" : val*100})
+
 
 if __name__ == "__main__":
 
@@ -113,6 +119,6 @@ if __name__ == "__main__":
     # WandB sweep
     with open("./assignment1/wandb_sweep_config.json") as f:
         sweep_config = json.load(f)
-    sweep_id = wandb.sweep(project="sweep_cross_entropy", sweep=sweep_config)
-    wandb.agent(sweep_id, function=main, count=500)
+    sweep_id = wandb.sweep(project="mean_squared_error_sweep", sweep=sweep_config)
+    wandb.agent(sweep_id, function=main, count=100)
 # data, X_train, X_val, X_test, y_train, y_val, y_test

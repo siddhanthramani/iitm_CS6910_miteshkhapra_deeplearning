@@ -1,0 +1,50 @@
+{
+    "os": "Windows-10-10.0.22621-SP0",
+    "python": "3.7.9",
+    "heartbeatAt": "2023-03-19T02:12:09.907911",
+    "startedAt": "2023-03-19T02:12:08.873682",
+    "docker": null,
+    "cuda": null,
+    "args": [],
+    "state": "running",
+    "program": "c:/Users/siddh/OneDrive/IIT Madras/deep_learning/iitm_CS6910_miteshkhapra_deeplearning/assignment1/main.py",
+    "codePath": "assignment1\\main.py",
+    "git": {
+        "remote": "https://github.com/siddhanthramani/iitm_CS6910_miteshkhapra_deeplearning.git",
+        "commit": "cc7b52043f9513210efe55749f20840461889d4c"
+    },
+    "email": "dhanth20@gmail.com",
+    "root": "C:/Users/siddh/OneDrive/IIT Madras/deep_learning/iitm_CS6910_miteshkhapra_deeplearning",
+    "host": "SiddhanthRamani",
+    "username": "siddh",
+    "executable": "C:\\Users\\siddh\\.virtualenvs\\iitm_CS6910_miteshkhapra_deeplearning-EmLAyZaZ\\Scripts\\python.exe",
+    "cpu_count": 8,
+    "cpu_count_logical": 16,
+    "cpu_freq": {
+        "current": 2566.0,
+        "min": 0.0,
+        "max": 3201.0
+    },
+    "cpu_freq_per_core": [
+        {
+            "current": 2566.0,
+            "min": 0.0,
+            "max": 3201.0
+        }
+    ],
+    "disk": {
+        "total": 951.6455039978027,
+        "used": 93.88253402709961
+    },
+    "gpu": "NVIDIA GeForce RTX 3060 Laptop GPU",
+    "gpu_count": 1,
+    "gpu_devices": [
+        {
+            "name": "NVIDIA GeForce RTX 3060 Laptop GPU",
+            "memory_total": 6442450944
+        }
+    ],
+    "memory": {
+        "total": 15.192405700683594
+    }
+}
