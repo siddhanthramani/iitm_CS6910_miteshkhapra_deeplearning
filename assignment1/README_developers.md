@@ -46,3 +46,24 @@ This should include any functionality which can be edited by the user.
 - weight_init = Add a new weight initialization function which takes in three inputs - Shape of axis 0 of input, Shape of axis 1 of input and worb which can either be "w" for weights init and "b" for bias init.
 
 <br>
+
+## Software development guidelines to be followed
+1. Maintaining a virtual environment is of high importance to enable easy development and deployment.
+Pipenv is used as it can resolve dependencies in the virtual environment.
+
+2. Windows and Linux compatability must be ensured as most users operate with a Windows system and most developers operate on Linux.
+
+3. Detailed separate documentation should be provided in the form of README's. Comments should be minimized as developers are prone to change code but not edit previously written comments.
+
+4. Modularity and functional programming is of utmost importance - one function should perform one task.
+
+5. OOPS concepts can be followed for easy usage and modular implementation. 
+
+6. "Premature optimization is the root of all evil" - Donald. E. Knuth - Do not plan in advance for something you are building today.
+For example, in our code neural network structure is defined as a simple dictionary and not using OOPS concepts (the famous nn.add_layer() implementations). Pytorch and other libraries use them as they provide vast functionality. That is not an objective of our code.
+
+7. The code should be developed such that it allows easy usage across collobarators. I worked on this code from two separate github profiles and from two separate workstations to keep this perspective in mind.
+
+8. Regular commits with easy to understand commit messages is a must. While regular commits were made and reasonably easy to read commit messages are present, a better standard could be followed.
+
+9. Since development is in Python, the code should be implemented in the Pythonic Standard following Python best practices. For example, the naming conventions should have underscores (No camelcase).
