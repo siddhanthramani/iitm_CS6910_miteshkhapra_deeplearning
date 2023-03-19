@@ -53,7 +53,7 @@ Your folder structure should resemble this:
 
 For each dataset, download the required data files and store it in the appropriate subfolder:
 
-- For fashionmnist - download the data from here:
+- For fashionmnist - download the data from here (copy paste the link to new tab - clicking does not work sometimes):
     <ol type="a">
      <li>http://fashion-mnist.s3-website.eu-central-1.amazonaws.com/train-images-idx3-ubyte.gz</li>
      <li>http://fashion-mnist.s3-website.eu-central-1.amazonaws.com/train-labels-idx1-ubyte.gz</li>
@@ -153,3 +153,4 @@ c. If loss/accuracy is not improving :
 14. [Gradient of mse loss wrt to softmax](https://stats.stackexchange.com/questions/153285/derivative-of-softmax-and-squared-error)
 15. [Gradient of softmax wrt to input](https://www.mldawn.com/the-derivative-of-softmaxz-function-w-r-t-z/)<br>
 Used 14 and 15 together to derive the gradient of mse loss wrt to the input last layer a(L).
+16. [Gradient of mse loss wrt to input](https://book.huihoo.com/deep-learning/version-30-03-2015/mlp.html) - My derivation did not calculate the gradients currently whereas the deep learning books loss function was doing a good job. So sticking with that.

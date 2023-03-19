@@ -3,7 +3,7 @@
 --dataset=fashionmnist
 --epochs=20
 --batch_size=64
---loss=cross_entropy
+--loss=mean_squared_error
 --weight_init=xavier
 --weight_init_multiplication_factor=1
 --augment_data_on=0

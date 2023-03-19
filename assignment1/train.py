@@ -62,7 +62,7 @@ def cli_parser():
     general_params_parser.add_argument("-b", "--batch_size", type=int, default=64
                         , help="Batch size used to train neural network."
                         , metavar="batch_size")
-    general_params_parser.add_argument("-l", "--loss", type=str, default="cross_entropy", choices=["mean_squared_error", "cross_entropy"]
+    general_params_parser.add_argument("-l", "--loss", type=str, default="mean_squared_error", choices=["mean_squared_error", "cross_entropy"]
                         , help="Loss function to optimize the model on."
                         , metavar="loss_function")
     general_params_parser.add_argument("-w_i", "--weight_init", type=str, default="xavier", choices=["random", "xavier"]

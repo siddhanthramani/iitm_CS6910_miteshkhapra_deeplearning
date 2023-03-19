@@ -48,11 +48,12 @@ def grad_wrt_output(y, y_pred, loss_function, activation):
             print(str_error_softmax)
     elif loss_function == "mean_squared_error":
         if activation == "softmax": 
-            # This is wrong - https://stats.stackexchange.com/questions/153285/derivative-of-softmax-and-squared-error
-            # return 2 * (y_pred - y) * y_pred * (1 - y_pred)
-            gradient = np.zeros(y.shape)
-            for neuron in range(len(y)):
-                gradient[neuron] = 2 * np.sum((y_pred - y) * ((y * y_pred * (1 - y_pred)) - ((1 -  y) * y_pred * y_pred[neuron])))
-            return gradient
+            # Deep learning book's derivation is working properly - I tested for a single input
+            return 2 * (y_pred - y) * y_pred * (1 - y_pred)
+            # My derivation is not working properly
+            # gradient = np.zeros(y.shape)
+            # for neuron in range(len(y)):
+            #     gradient[neuron] = 2 * np.sum((y_pred - y) * ((y * y_pred * (1 - y_pred)) - ((1 -  y) * y_pred * y_pred[neuron])))
+            # return gradient
         else:
             print(str_error_softmax)

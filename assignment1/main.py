@@ -119,6 +119,6 @@ if __name__ == "__main__":
     # WandB sweep
     with open("./assignment1/wandb_sweep_config.json") as f:
         sweep_config = json.load(f)
-    sweep_id = wandb.sweep(project="mean_squared_error_sweep", sweep=sweep_config)
+    sweep_id = wandb.sweep(project="mean_squared_error_sweep_2", sweep=sweep_config)
     wandb.agent(sweep_id, function=main, count=100)
 # data, X_train, X_val, X_test, y_train, y_val, y_test

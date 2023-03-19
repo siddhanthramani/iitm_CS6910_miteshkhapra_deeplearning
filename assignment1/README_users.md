@@ -52,10 +52,10 @@ python assignment1/train.py --help
     ```
     where "path_to_argument_list_text_file" is a text file which contains the flag value pairs.<br>
     Note that the text file should have one flag value pair per line and there should be no additional spaces either in between or at the end of the line.<br>
-    For example, have a look at the assignment1/wandb_expt_args1.txt <br>
-    To train the models with the flags in assignment1/wandb_expt_args1.txt, run
+    For example, have a look at the assignment1/wandb_expt_args.txt <br>
+    To train the models with the flags in assignment1/wandb_expt_args.txt, run
     ```
-    python assignment1/train.py @assignment1/wandb_expt_args1.txt
+    python assignment1/train.py @assignment1/wandb_expt_args.txt
     ```
     Note that the "@" symbol should be present before the text file path.
 
