@@ -62,8 +62,10 @@ Pipenv is used as it can resolve dependencies in the virtual environment.
 6. "Premature optimization is the root of all evil" - Donald. E. Knuth - Do not plan in advance for something you are building today.
 For example, in our code neural network structure is defined as a simple dictionary and not using OOPS concepts (the famous nn.add_layer() implementations). Pytorch and other libraries use them as they provide vast functionality. That is not an objective of our code.
 
-7. The code should be developed such that it allows easy usage across collobarators. I worked on this code from two separate github profiles and from two separate workstations to keep this perspective in mind.
+7. The code should be developed such that it allows easy usage across collabarators. I worked on this code from two separate github profiles and from two separate workstations to keep this perspective in mind.
 
-8. Regular commits with easy to understand commit messages is a must. While regular commits were made and reasonably easy to read commit messages are present, a better standard could be followed.
+8. Different branches should be present when multiple different collabarators are present and the main branch should be protected. I have not followed this till now as a single user was working on the code.
 
-9. Since development is in Python, the code should be implemented in the Pythonic Standard following Python best practices. For example, the naming conventions should have underscores (No camelcase).
+9. Regular commits with easy to understand commit messages is a must. While regular commits were made and reasonably easy to read commit messages are present, a better standard could be followed.
+
+10. Since development is in Python, the code should be implemented in the Pythonic Standard following Python best practices. For example, the naming conventions should have underscores (No camelcase).

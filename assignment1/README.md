@@ -153,4 +153,4 @@ c. If loss/accuracy is not improving :
 14. [Gradient of mse loss wrt to softmax](https://stats.stackexchange.com/questions/153285/derivative-of-softmax-and-squared-error)
 15. [Gradient of softmax wrt to input](https://www.mldawn.com/the-derivative-of-softmaxz-function-w-r-t-z/)<br>
 Used 14 and 15 together to derive the gradient of mse loss wrt to the input last layer a(L).
-16. [Gradient of mse loss wrt to input](https://book.huihoo.com/deep-learning/version-30-03-2015/mlp.html) - My derivation did not calculate the gradients currently whereas the deep learning books loss function was doing a good job. So sticking with that.
+16. [Gradient of mse loss wrt to input](https://book.huihoo.com/deep-learning/version-30-03-2015/mlp.html) - My derivation did not calculate the gradients currently whereas the deep learning book's derivative was doing a good job. So sticking with that.
