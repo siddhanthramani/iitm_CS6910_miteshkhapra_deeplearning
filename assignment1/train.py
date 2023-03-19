@@ -178,7 +178,7 @@ if __name__ == "__main__":
     dict_neural_network_structure[number_of_hidden_layers + 1] = 10
     for hidden_layer in range(1, number_of_hidden_layers + 1):
         dict_neural_network_structure[hidden_layer] = size_of_every_hidden_layer
-    
+    dict_neural_network_structure = {0:28*28, 1:64, 2:32, 3:16, 4:10}
     # Defining the activations
     activation_dict = {0 : activation, 1 : "softmax"}
     
