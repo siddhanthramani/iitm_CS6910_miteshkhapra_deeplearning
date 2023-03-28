@@ -42,6 +42,7 @@ zipp = "==3.15.0"
 tqdm = "*"
 pandas = "*"
 pycodestyle = "*"
+lightning = "*"
 
 [dev-packages]
 
