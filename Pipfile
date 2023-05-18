@@ -43,6 +43,9 @@ tqdm = "*"
 pandas = "*"
 pycodestyle = "*"
 lightning = "*"
+torch = "*"
+torchvision = "*"
+torchaudio = "*"
 
 [dev-packages]
 
