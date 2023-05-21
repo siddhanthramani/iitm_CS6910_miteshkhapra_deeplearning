@@ -6,9 +6,9 @@ from constants import SOS_token, EOS_token
 class Lang:
     def __init__(self, name):
         self.name = name
-        self.char2index = {"SOS": 0, "EOS": 1}
+        self.char2index = {"SOS": 0, "EOS": 1, "UNKNOWN": 2}
         self.char2count = {}
-        self.index2char = {0: "SOS", 1: "EOS"}
+        self.index2char = {0: "SOS", 1: "EOS", 2: "UNKNOWN"}
         self.n_chars = 2  # Count SOS and EOS
 
     def addword(self, word):

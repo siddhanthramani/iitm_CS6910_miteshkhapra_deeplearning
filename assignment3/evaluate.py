@@ -4,7 +4,7 @@ import random
 
 from constants import SOS_token, EOS_token, MAX_LENGTH,  get_device
 from train_eval_helpers import *
-
+from metrics import *
 
 device = get_device()
 
@@ -47,13 +47,15 @@ def evaluate(input_lang, output_lang, encoder, decoder, word, max_length=MAX_LEN
         return decoded_chars, decoder_attentions[:di + 1]
     
 
-def evaluateRandomly(pairs, encoder, decoder, n=10):
-    for i in range(n):
-        pair = random.choice(pairs)
-        print('>', pair[0])
-        print('=', pair[1])
+def evaluate_batch(eval_pairs, encoder, decoder):
+    true_list = []
+    prediction_list = []
+    for pair in eval_pairs:
+        pair = random.choice(eval_pairs)
         # output_chars, attentions = evaluate(encoder, decoder, pair[0])
         output_chars = evaluate(encoder, decoder, pair[0])
         output_word = ' '.join(output_chars)
-        print('<', output_chars)
-        print('')
+        true_list.append(pair[1])
+        prediction_list.append(output_word)
+    
+    return prediction_list, true_list

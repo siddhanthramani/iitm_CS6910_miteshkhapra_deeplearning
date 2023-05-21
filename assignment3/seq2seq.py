@@ -30,7 +30,7 @@ class EncoderRNN(nn.Module):
         return output, hidden
     
     def initHidden(self):
-        return torch.zeros(1, 1, self.hidden_size, device=device)
+        return torch.zeros(self.num_layers, 1, self.hidden_size, device=device)
     
 
 class DecoderRNN(nn.Module):
@@ -56,7 +56,7 @@ class DecoderRNN(nn.Module):
         return final_output, hidden
 
     def initHidden(self):
-        return torch.zeros(1, 1, self.hidden_size, device=device)
+        return torch.zeros(self.num_layers, 1, self.hidden_size, device=device)
     
 
 class AttnDecoderRNN(nn.Module):
@@ -94,4 +94,4 @@ class AttnDecoderRNN(nn.Module):
         return output, hidden, attn_weights
 
     def initHidden(self):
-        return torch.zeros(1, 1, self.hidden_size, device=device)
+        return torch.zeros(self.num_layers, 1, self.hidden_size, device=device)

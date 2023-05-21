@@ -14,7 +14,7 @@ device = get_device()
 
 
 def indexesFromword(lang, word):
-    return [lang.char2index[char] for char in list(word)]
+    return [lang.char2index.get(char, 2) for char in list(word)]
 
 
 def tensorFromword(lang, word):
