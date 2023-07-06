@@ -30,7 +30,10 @@ class EncoderRNN(nn.Module):
         return output, hidden
     
     def initHidden(self):
-        return torch.zeros(self.num_layers, 1, self.hidden_size, device=device)
+        if self.bidirectional:
+            return torch.zeros(2*(self.num_layers), 1, self.hidden_size, device=device)
+        else:
+            return torch.zeros(self.num_layers, 1, self.hidden_size, device=device)
     
 
 class DecoderRNN(nn.Module):
